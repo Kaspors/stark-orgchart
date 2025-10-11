@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Edit Person • STARK Org Chart</title>
+  <link rel="stylesheet" href="/static/styles.css"/>
+</head>
+<body>
+  <div id="topbar">
+    <div id="logo">🟧 <strong>Edit Person</strong></div>
+    <div id="controls">
+      <a class="btn-link" href="/admin">Back to Admin</a>
+      <a class="btn-link" href="/">Org Chart</a>
+    </div>
+  </div>
+
+  <div style="padding:16px;max-width:900px">
+    <div id="form" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button id="save">Save</button>
+      <button id="cancel">Cancel</button>
+    </div>
+  </div>
+
+  <script src="/static/edit.js"></script>
+</body>
+</html>

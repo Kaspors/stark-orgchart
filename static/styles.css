@@ -1,0 +1,90 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: #0b0f14;
+  font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color: #e6edf3;
+}
+
+/* Top bar */
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #0f172a;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(148,163,184,0.25);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+#logo {
+  font-weight: 800;
+  color: #F5821E;
+}
+
+/* Inputs & buttons */
+#q, #adminKey, #file, input[type="text"] {
+  border-radius: 8px;
+  border: 1px solid rgba(148,163,184,0.3);
+  background: #0b1220;
+  color: #e6edf3;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+#q { flex: 1; }
+
+#controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#controls button {
+  background: #F5821E;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+#controls button:hover { background: #f89b47; }
+
+/* Link-styled button for navigation */
+.btn-link {
+  display: inline-block;
+  text-decoration: none;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  background: #0b1220;
+  border: 1px solid rgba(148,163,184,0.35);
+  color: #e6edf3;
+}
+.btn-link:hover {
+  background: #121a2b;
+  border-color: rgba(148,163,184,0.6);
+}
+
+/* Chart area */
+#chart {
+  height: calc(100vh - 56px);
+  overflow: hidden;
+}
+
+/* Table (admin) */
+table th, table td { padding: 6px 8px; border-bottom: 1px solid rgba(148,163,184,0.15); }
+table thead th { border-bottom: 1px solid rgba(148,163,184,0.35); }
+button.del { background:#c73e3e;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer; }
+button.del:hover { background:#d45a5a; }
+
+.btn-link {
+  display:inline-block; text-decoration:none; padding:7px 12px; border-radius:8px;
+  font-weight:800; background:#0b1220; border:1px solid rgba(148,163,184,0.35); color:#e6edf3;
+}
+.btn-link:hover { background:#121a2b; border-color:rgba(148,163,184,0.6); }

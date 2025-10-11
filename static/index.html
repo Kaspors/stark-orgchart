@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STARK Org Chart</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body>
+  <div id="topbar">
+    <div id="logo">🟧 <strong>STARK Org Chart</strong></div>
+
+    <input id="q" placeholder="Search name, title, department, sub-department, team…" />
+
+    <div id="controls">
+      <button id="fit">Fit</button>
+      <button id="expand">Expand all</button>
+      <button id="collapse">Collapse (2 levels)</button>
+      <a class="btn-link" href="/admin" title="Go to Admin">Admin</a>
+    </div>
+  </div>
+
+  <div id="chart"></div>
+
+  <script src="/static/chart.js"></script>
+</body>
+</html>
