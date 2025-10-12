@@ -1,0 +1,24 @@
+[
+  {
+    "id": "1",
+    "name": "Morten S.",
+    "title": "Head of Architecture v2",
+    "managerId": null,
+    "department": "",
+    "subdepartment": "",
+    "team": "",
+    "role": ""
+  },
+  {
+    "id": "2",
+    "name": "Ernesto",
+    "title": "Engineer",
+    "managerId": "1"
+  },
+  {
+    "id": "3",
+    "name": "Mateusz",
+    "title": "Engineer",
+    "managerId": "1"
+  }
+]

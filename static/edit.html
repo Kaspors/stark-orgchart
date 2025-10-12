@@ -1,28 +1,123 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Edit Person • STARK Org Chart</title>
-  <link rel="stylesheet" href="/static/styles.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Edit Person · STARK Org Chart</title>
+  <link rel="stylesheet" href="/static/styles.css?v=1" />
+  <style>
+    :root { --gap: 10px; }
+    html, body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    header {
+      display:flex; align-items:center; gap:8px; padding:10px 12px;
+      border-bottom:1px solid rgba(0,0,0,.1); background:#fff; position:sticky; top:0; z-index:5;
+    }
+    header .spacer { flex:1; }
+    .badge { font-weight:800; color:#f36f21; display:flex; align-items:center; gap:6px; }
+    .toolbar { display:flex; align-items:center; gap:8px; }
+    .btn {
+      border:1px solid rgba(0,0,0,.15); background:#fff; padding:.4rem .7rem;
+      border-radius:.5rem; cursor:pointer; font-size:.9rem;
+    }
+    .btn:hover { background:#f3f3f3; }
+    main { padding:14px 12px 28px; max-width:860px; }
+    form { display:block; }
+    .field { margin-bottom: var(--gap); display:flex; gap:12px; align-items:center; }
+    .field label { width:160px; font-weight:600; }
+    .field input, .field select {
+      flex:1; min-width:220px; height:32px; padding:0 8px;
+      border:1px solid rgba(0,0,0,.2); border-radius:6px; font-size:.95rem;
+    }
+    .actions { margin-top:16px; display:flex; gap:10px; }
+    .note { margin-top:10px; font-size:.9rem; color:#555; }
+    /* Admin key */
+    .adminkey { display:flex; align-items:center; gap:6px; }
+    .adminkey input {
+      width:220px; height:32px; padding:0 8px; border:1px solid rgba(0,0,0,.2); border-radius:6px;
+    }
+    #toast {
+      position: fixed; right: 12px; bottom: 12px; background: rgba(0,0,0,.82);
+      color:#fff; padding:10px 12px; border-radius:8px; font-size:.9rem; display:none;
+    }
+  </style>
 </head>
 <body>
-  <div id="topbar">
-    <div id="logo">🟧 <strong>Edit Person</strong></div>
-    <div id="controls">
-      <a class="btn-link" href="/admin">Back to Admin</a>
-      <a class="btn-link" href="/">Org Chart</a>
-    </div>
-  </div>
+  <header>
+    <div class="badge">📝 Edit Person</div>
+    <div class="spacer"></div>
 
-  <div style="padding:16px;max-width:900px">
-    <div id="form" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
-    <div style="margin-top:12px;display:flex;gap:8px">
-      <button id="save">Save</button>
-      <button id="cancel">Cancel</button>
+    <div class="adminkey">
+      <label for="adminKey" title="Used for saving changes">Admin key</label>
+      <input id="adminKey" type="password" placeholder="enter key…" />
+      <button id="btnShowKey" class="btn" title="Show/hide">👁</button>
+      <button id="btnSaveKey" class="btn" title="Save key locally">Save key</button>
     </div>
-  </div>
 
-  <script src="/static/edit.js"></script>
+    <div class="toolbar">
+      <a class="btn" href="/admin">Back to Admin</a>
+      <a class="btn" href="/">Org Chart</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Always-visible form -->
+    <form id="personForm" autocomplete="off">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required />
+      </div>
+
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" />
+      </div>
+
+      <div class="field">
+        <label for="department">Department</label>
+        <input id="department" name="department" type="text" />
+      </div>
+
+      <div class="field">
+        <label for="subdepartment">Sub-department</label>
+        <input id="subdepartment" name="subdepartment" type="text" />
+      </div>
+
+      <div class="field">
+        <label for="team">Team</label>
+        <input id="team" name="team" type="text" />
+      </div>
+
+      <div class="field">
+        <label for="role">Role</label>
+        <select id="role" name="role">
+          <option value="">(none)</option>
+          <option>Head</option>
+          <option>Manager</option>
+          <option>Lead</option>
+          <option>Engineer</option>
+          <option>Contractor</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="manager">Manager</label>
+        <select id="manager" name="manager">
+          <option value="">(none)</option>
+        </select>
+      </div>
+    </form>
+
+    <div class="actions">
+      <button id="btnSave" class="btn">Save</button>
+      <button id="btnCancel" class="btn">Cancel</button>
+    </div>
+
+    <p class="note" id="hint"></p>
+  </main>
+
+  <div id="toast"></div>
+
+  <!-- Defer ensures DOM exists before the script runs -->
+  <script defer src="/static/edit.js?v=1400"></script>
 </body>
 </html>
