@@ -1,142 +1,126 @@
-(async function () {
-  const container = document.getElementById('chart');
+(function () {
+  const containerSel = '#chart';
+  const alertSel = '#alert';
+  const infoSel = '#info';
 
-  const res = await fetch('/api/tree');
-  if (!res.ok) {
-    container.innerHTML = `<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#e6edf3">
-      Failed to load (HTTP ${res.status})
-    </div>`;
-    return;
-  }
-  const nodesRaw = await res.json();
-  if (!Array.isArray(nodesRaw) || nodesRaw.length === 0) {
-    container.innerHTML = `<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#e6edf3">
-      <div style="text-align:center">
-        <div style="font-weight:800;font-size:18px;margin-bottom:8px">No data yet</div>
-        <a href="/admin" style="display:inline-block;background:#F5821E;color:#000;padding:10px 14px;border-radius:10px;font-weight:800;text-decoration:none">Open Admin</a>
-      </div>
-    </div>`;
-    return;
+  const setInfo = t => { const el = document.querySelector(infoSel); if (el) el.textContent = t; };
+  const showAlert = html => { const el = document.querySelector(alertSel); if (!el) return; el.innerHTML = html; el.style.display = 'block'; };
+  const clearAlert = () => { const el = document.querySelector(alertSel); if (!el) return; el.style.display = 'none'; el.innerHTML = ''; };
+
+  function ensureDeps() {
+    if (typeof d3 === 'undefined') throw new Error('d3 not loaded');
+    if (typeof d3.flextree !== 'function') throw new Error('d3-flextree not loaded (d3.flextree missing)');
+    if (typeof d3.OrgChart === 'undefined') throw new Error('d3-org-chart not loaded');
   }
 
-  const ids = new Set(nodesRaw.map(n => n.id));
-  const tops = nodesRaw.filter(n => !n.parentId || !ids.has(n.parentId));
-  const nodes = nodesRaw.map(n => ({...n}));
-  if (tops.length !== 1) {
-    const VROOT = '__virtual_root__';
-    nodes.unshift({ id: VROOT, parentId: null, type: 'unit', name: 'STARK IT Delivery', unit_level: 'department' });
-    for (const n of nodes) {
-      if (n.id !== VROOT && (!n.parentId || !ids.has(n.parentId))) n.parentId = VROOT;
-    }
+  // --- Data helpers ---
+  async function loadFromApi() {
+    const res = await fetch('/api/tree', { headers: { accept: 'application/json' } });
+    if (!res.ok) throw new Error(`GET /api/tree → HTTP ${res.status}`);
+    const json = await res.json();
+    if (!Array.isArray(json)) throw new Error('GET /api/tree → expected array');
+    return json;
   }
 
-  const svg = d3.select(container).append('svg').attr('width', '100%').attr('height', '100%');
-  const gZoom = svg.append('g');
-  const gLinks = gZoom.append('g').attr('class', 'links');
-  const gNodes = gZoom.append('g').attr('class', 'nodes');
-
-  const zoom = d3.zoom().scaleExtent([0.2, 2]).on('zoom', (e) => gZoom.attr('transform', e.transform));
-  svg.call(zoom);
-
-  const card = {
-    w: 300, h: 96, vGap: 44, hGap: 64,
-    render(d) {
-      if (d.data.type === 'unit') {
-        const level = (d.data.unit_level || 'unit').replace('_', ' ');
-        const mgr = d.data.manager_name ? `Manager: ${d.data.manager_name}` : 'Manager: —';
-        return `
-          <foreignObject x="${-this.w/2}" y="${-this.h/2}" width="${this.w}" height="${this.h}">
-            <div xmlns="http://www.w3.org/1999/xhtml"
-                 style="width:${this.w}px;height:${this.h}px;padding:12px;
-                        display:flex;gap:12px;align-items:center;
-                        background:#0f172a;border:1px solid rgba(255,255,255,.18);
-                        border-radius:16px;box-shadow:0 2px 6px rgba(0,0,0,.35);">
-              <div style="width:48px;height:48px;border-radius:10px;background:#00326E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff">
-                ${level[0].toUpperCase()}
-              </div>
-              <div style="min-width:0">
-                <div style="font-weight:900;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff">${d.data.name}</div>
-                <div style="font-size:12.5px;color:#c5d3e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${mgr}</div>
-              </div>
-            </div>
-          </foreignObject>`;
-      } else {
-        const p = d.data;
-        const sub = [p.role, p.title, p.department, p.sub_department, p.team].filter(Boolean).join(' • ');
-        return `
-          <foreignObject x="${-this.w/2}" y="${-this.h/2}" width="${this.w}" height="${this.h}">
-            <div xmlns="http://www.w3.org/1999/xhtml"
-                 style="width:${this.w}px;height:${this.h}px;padding:12px;
-                        display:flex;gap:12px;align-items:center;
-                        background:#0f172a;border:1px solid rgba(255,255,255,.12);
-                        border-radius:16px;box-shadow:0 2px 6px rgba(0,0,0,.35);">
-              <div style="width:48px;height:48px;border-radius:10px;background:#F5821E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#000">
-                ${(p.name||'?').charAt(0).toUpperCase()}
-              </div>
-              <div style="min-width:0">
-                <div style="font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff">${p.name||''}</div>
-                <div style="font-size:12.5px;color:#c5d3e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>
-              </div>
-            </div>
-          </foreignObject>`;
-      }
-    }
-  };
-
-  const stratify = d3.stratify().id(d => d.id).parentId(d => d.parentId);
-  const root = stratify(nodes);
-  root.each(d => (d._children = d.children));
-  root.children && root.children.forEach(collapseToDepth);
-  function collapseToDepth(d, depth = 1) {
-    if (d.depth >= depth && d.children) { d._children = d.children; d.children = null; }
-    (d.children || d._children || []).forEach(ch => collapseToDepth(ch, depth));
+  function cleanParentId(x) {
+    if (x === null || x === undefined) return null;
+    const s = String(x).trim().toLowerCase();
+    if (s === '' || s === 'null' || s === 'undefined') return null;
+    return String(x);
   }
 
-  function render(centerNode = root) {
-    const tree = d3.tree()
-      .nodeSize([card.h + card.vGap, card.w + card.hGap])
-      .separation((a, b) => (a.parent === b.parent ? 1 : 1.2));
-    tree(root);
+  function normalizeData(records) {
+    // Make shallow copy & normalize ids
+    const data = records.map((r, i) => ({
+      ...r,
+      id: String(r.id ?? r.ID ?? r.Id ?? `n${i}`),
+      parentId: cleanParentId(r.parentId ?? r.ParentId ?? r.managerId ?? r.ManagerId ?? r.Manager),
+      name: r.name ?? r.Name ?? r.fullName ?? String(r.id ?? r.ID ?? r.Id ?? `n${i}`),
+      title: r.title ?? r.Title ?? r.role ?? r.Role ?? r.Function ?? ''
+    }));
 
-    const linkGen = d3.linkHorizontal().x(d => d.y).y(d => d.x);
-    const link = gLinks.selectAll('path.link').data(root.links(), d => d.target.id);
-    link.enter().append('path').attr('class','link').attr('fill','none')
-      .attr('stroke','rgba(148,163,184,0.35)').attr('stroke-width',1.2).attr('d',linkGen);
-    link.transition().duration(300).attr('d',linkGen);
-    link.exit().remove();
+    // Count roots
+    const roots = data.filter(n => n.parentId === null);
+    if (roots.length <= 1) return { data, rootsCount: roots.length, syntheticRootAdded: false };
 
-    const node = gNodes.selectAll('g.node').data(root.descendants(), d => d.id);
-    const nodeEnter = node.enter().append('g').attr('class','node')
-      .attr('transform', d => `translate(${d.y},${d.x})`)
-      .style('cursor','pointer')
-      .on('click', (e,d) => { if(d.children){d._children=d.children; d.children=null;} else {d.children=d._children; d._children=null;} render(d); });
-
-    nodeEnter.append('g').html(d => card.render(d));
-    node.transition().duration(300).attr('transform', d => `translate(${d.y},${d.x})`);
-    node.exit().remove();
+    // Add a synthetic root
+    const ROOT_ID = '__root__';
+    const synthetic = { id: ROOT_ID, parentId: null, name: 'All Functions', title: '' };
+    // Attach all current roots under synthetic
+    const attached = data.map(n => (n.parentId === null ? { ...n, parentId: ROOT_ID } : n));
+    return { data: [synthetic, ...attached], rootsCount: roots.length, syntheticRootAdded: true };
   }
 
-  document.getElementById('expand').onclick = () => { expandAll(root); render(root); };
-  document.getElementById('collapse').onclick = () => { collapseToDepth(root, 1); render(root); };
-  document.getElementById('fit').onclick = () => { render(root); };
-  function expandAll(d){ if(d._children){d.children=d._children; d._children=null;} (d.children||[]).forEach(expandAll); }
+  function demoData() {
+    return [
+      { id: '1', parentId: null, name: 'Morten S.', title: 'Head of Architecture' },
+      { id: '2', parentId: '1', name: 'Ernesto',   title: 'Engineer' },
+      { id: '3', parentId: '1', name: 'Mateusz',   title: 'Engineer' },
+    ];
+  }
 
-  const q = document.getElementById('q');
-  q.addEventListener('input', () => {
-    const v = (q.value || '').toLowerCase().trim(); if(!v) return;
-    const all = root.descendants();
-    const match = all.find(n => {
-      const x = n.data;
-      if (x.type === 'unit') return (x.name||'').toLowerCase().includes(v);
-      return [x.name,x.role,x.title,x.department,x.sub_department,x.team]
-        .filter(Boolean).some(s => s.toLowerCase().includes(v));
+  async function renderChart(data) {
+    const chart = new d3.OrgChart()
+      .container(containerSel)
+      .data(data)
+      .nodeId(d => d.id)
+      .parentNodeId(d => d.parentId ?? null)
+      // This build uses nodeWidth/nodeHeight (not nodeSize)
+      .nodeWidth(() => 260)
+      .nodeHeight(() => 90)
+      .childrenMargin(() => 36)
+      .compactMarginBetween(() => 22)
+      .compactMarginPair(() => 44)
+      .initialZoom(0.8)
+      .nodeContent(d => `
+        <div class="node-card">
+          <p class="node-name">${(d.data.name ?? d.data.Name ?? d.data.fullName ?? d.data.id) || '—'}</p>
+          <p class="node-title">${(d.data.title ?? d.data.role ?? d.data.Role ?? d.data.Function ?? '')}</p>
+        </div>
+      `);
+
+    await chart.render();
+
+    document.getElementById('btn-zoom-in')?.addEventListener('click', () => chart.zoomIn());
+    document.getElementById('btn-zoom-out')?.addEventListener('click', () => chart.zoomOut());
+    document.getElementById('btn-fit')?.addEventListener('click', () => chart.fit());
+
+    let t;
+    window.addEventListener('resize', () => {
+      clearTimeout(t);
+      t = setTimeout(() => chart.fit(), 150);
     });
-    if (match) {
-      let p = match; while (p){ if(p._children){p.children=p._children; p._children=null;} p=p.parent; }
-      render(match);
-    }
-  });
 
-  new ResizeObserver(() => render(root)).observe(container);
-  render(root);
+    setInfo(`${data.length} nodes`);
+    console.info('[orgchart] nodes:', data.length, 'sample:', data.slice(0, 5));
+  }
+
+  async function main() {
+    setInfo('loading…'); clearAlert();
+
+    try { ensureDeps(); }
+    catch (e) { console.error(e); showAlert(`<strong>Library load error.</strong> ${e.message}`); setInfo('error'); return; }
+
+    // Load real data (fallback to demo)
+    let raw = [];
+    try { raw = await loadFromApi(); }
+    catch (e) { console.warn('Using demo data. Reason:', e); showAlert(`<strong>Using demo data.</strong> Could not load <code>/api/tree</code>: ${e.message}`); raw = demoData(); }
+
+    if (!Array.isArray(raw) || raw.length === 0) { showAlert('<strong>No data.</strong> The dataset is empty.'); setInfo('empty'); return; }
+
+    // Normalize + synthetic root if needed
+    const { data, rootsCount, syntheticRootAdded } = normalizeData(raw);
+    if (syntheticRootAdded) {
+      showAlert(`<strong>Multiple roots detected (${rootsCount}).</strong> Added a synthetic root “All Functions” for layout.`);
+    }
+
+    // Validate shape after normalization
+    const badShape = data.some(d => typeof d.id === 'undefined' || !('parentId' in d));
+    if (badShape) { console.warn('Bad data sample:', data.slice(0, 5)); showAlert('<strong>Unexpected data shape.</strong> Need { id, parentId, name, title }.'); setInfo('bad-data'); return; }
+
+    try { await renderChart(data); }
+    catch (e) { console.error('Render error:', e); showAlert(`<strong>Render error.</strong> ${e.message || e}`); setInfo('error'); }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', main); else main();
 })();
