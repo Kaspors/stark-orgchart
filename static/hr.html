@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>STARK HR System</title>
+  <link rel="stylesheet" href="/static/hr.css"/>
+</head>
+<body>
+
+<!-- ── Topbar ──────────────────────────────────────────────────────────────── -->
+<div id="topbar">
+  <div class="logo">STARK <span>HR</span></div>
+  <nav class="topbar-nav">
+    <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+    <button class="nav-btn" data-section="employees">Employees</button>
+    <button class="nav-btn" data-section="departments">Departments</button>
+    <button class="nav-btn" data-section="scrum">Scrum Teams</button>
+    <button class="nav-btn" data-section="reports">Reports</button>
+  </nav>
+  <div class="topbar-right">
+    <input id="admin-key-input" type="password" placeholder="Admin key" title="Enter admin key to enable write operations"/>
+    <a href="/" class="topbar-link">Org Chart</a>
+  </div>
+</div>
+
+<div id="main">
+
+  <!-- ── DASHBOARD ────────────────────────────────────────────────────────── -->
+  <section id="sec-dashboard" class="section active">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Organisation at a glance</div>
+      </div>
+    </div>
+    <div class="stat-grid" id="stat-grid">
+      <div class="stat-card"><div class="stat-label">Total Employees</div><div class="stat-value" id="stat-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Active Employees</div><div class="stat-value" id="stat-active">—</div></div>
+      <div class="stat-card"><div class="stat-label">Departments</div><div class="stat-value" id="stat-depts">—</div></div>
+      <div class="stat-card"><div class="stat-label">Scrum Teams</div><div class="stat-value" id="stat-scrums">—</div></div>
+    </div>
+    <div class="report-grid" id="dash-charts"></div>
+  </section>
+
+  <!-- ── EMPLOYEES ────────────────────────────────────────────────────────── -->
+  <section id="sec-employees" class="section">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Employees</div>
+        <span class="page-subtitle" id="emp-count"></span>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-primary" id="btn-add-employee">+ Add Employee</button>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <input type="search" id="emp-search" placeholder="Search by name…"/>
+      <select id="emp-filter-dept"><option value="">All Departments</option></select>
+      <select id="emp-filter-seniority">
+        <option value="">All Seniority</option>
+        <option>Intern</option><option>Junior</option><option>Mid</option>
+        <option>Senior</option><option>Lead</option><option>Principal</option><option>Staff</option>
+      </select>
+      <select id="emp-filter-status">
+        <option value="">All Status</option>
+        <option>Active</option><option>On Leave</option><option>Terminated</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th><th>Emp #</th><th>Title</th><th>Department</th>
+            <th>Manager</th><th>Seniority</th><th>Type</th><th>Status</th>
+            <th>Scrum Teams</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="emp-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── DEPARTMENTS ──────────────────────────────────────────────────────── -->
+  <section id="sec-departments" class="section">
+    <div class="page-header">
+      <div><div class="page-title">Departments &amp; Org Units</div></div>
+      <div class="page-header-actions">
+        <button class="btn btn-primary" id="btn-add-dept">+ Add Org Unit</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th><th>Level</th><th>Parent Unit</th><th>Manager</th><th>Members</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="dept-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── SCRUM TEAMS ───────────────────────────────────────────────────────── -->
+  <section id="sec-scrum" class="section">
+    <div class="page-header">
+      <div><div class="page-title">Scrum Teams</div></div>
+      <div class="page-header-actions">
+        <button class="btn btn-secondary" id="btn-scrum-list-view" style="display:none">← All Teams</button>
+        <button class="btn btn-primary" id="btn-add-scrum">+ New Team</button>
+      </div>
+    </div>
+    <div id="scrum-list-view">
+      <div class="scrum-grid" id="scrum-grid"></div>
+    </div>
+    <div id="scrum-detail-view" style="display:none"></div>
+  </section>
+
+  <!-- ── REPORTS ──────────────────────────────────────────────────────────── -->
+  <section id="sec-reports" class="section">
+    <div class="page-header">
+      <div><div class="page-title">Reports</div></div>
+      <div class="page-header-actions">
+        <button class="btn btn-secondary" onclick="window.print()">Print / Export</button>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+      <button class="btn btn-secondary active-report" data-report="org" id="rbtn-org">Org Structure</button>
+      <button class="btn btn-secondary" data-report="scrum-teams" id="rbtn-scrum">Scrum Teams</button>
+      <button class="btn btn-secondary" data-report="managers" id="rbtn-mgr">Managers &amp; Reports</button>
+    </div>
+
+    <div id="report-org"></div>
+    <div id="report-scrum-teams" style="display:none"></div>
+    <div id="report-managers" style="display:none"></div>
+  </section>
+
+</div><!-- #main -->
+
+<!-- ── EMPLOYEE MODAL ──────────────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="modal-employee">
+  <div class="modal">
+    <button class="modal-close" data-close="modal-employee">×</button>
+    <div class="modal-title" id="modal-emp-title">Add Employee</div>
+    <form id="form-employee" autocomplete="off">
+      <div class="form-grid">
+        <div class="form-section-title">Identity</div>
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input name="name" required placeholder="Jane Smith"/>
+        </div>
+        <div class="form-group">
+          <label>Employee Number</label>
+          <input name="employee_number" placeholder="EMP-001"/>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input name="email" type="email" placeholder="jane@company.com"/>
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input name="phone" placeholder="+45 12 34 56 78"/>
+        </div>
+
+        <div class="form-section-title">Role &amp; Organisation</div>
+        <div class="form-group">
+          <label>Job Title</label>
+          <input name="title" placeholder="Senior Developer"/>
+        </div>
+        <div class="form-group">
+          <label>Management Role</label>
+          <select name="role">
+            <option value="">None</option>
+            <option>Head</option><option>Director</option>
+            <option>Senior Manager</option><option>Manager</option><option>Specialist</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <input name="department" placeholder="Technology" list="dept-list"/>
+          <datalist id="dept-list"></datalist>
+        </div>
+        <div class="form-group">
+          <label>Sub-department</label>
+          <input name="sub_department" placeholder="Platform Engineering"/>
+        </div>
+        <div class="form-group">
+          <label>Team</label>
+          <input name="team" placeholder="Core Platform"/>
+        </div>
+        <div class="form-group">
+          <label>Manager</label>
+          <select name="manager_id"><option value="">None</option></select>
+        </div>
+        <div class="form-group">
+          <label>Org Unit</label>
+          <select name="org_unit_id"><option value="">None</option></select>
+        </div>
+        <div class="form-group">
+          <label>Cost Centre</label>
+          <input name="cost_center" placeholder="CC-100"/>
+        </div>
+
+        <div class="form-section-title">Employment Details</div>
+        <div class="form-group">
+          <label>Seniority</label>
+          <select name="seniority">
+            <option value="">Not set</option>
+            <option>Intern</option><option>Junior</option><option>Mid</option>
+            <option>Senior</option><option>Lead</option><option>Principal</option><option>Staff</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Employment Type</label>
+          <select name="employment_type">
+            <option value="">Not set</option>
+            <option>Full-time</option><option>Part-time</option>
+            <option>Contractor</option><option>Intern</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status">
+            <option>Active</option><option>On Leave</option><option>Terminated</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input name="location" placeholder="Copenhagen"/>
+        </div>
+        <div class="form-group">
+          <label>Start Date</label>
+          <input name="start_date" type="date"/>
+        </div>
+        <div class="form-group">
+          <label>End Date</label>
+          <input name="end_date" type="date"/>
+        </div>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modal-employee">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-employee">Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DEPARTMENT MODAL ────────────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="modal-dept">
+  <div class="modal">
+    <button class="modal-close" data-close="modal-dept">×</button>
+    <div class="modal-title" id="modal-dept-title">Add Org Unit</div>
+    <form id="form-dept" autocomplete="off">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Name *</label>
+          <input name="name" required placeholder="Technology"/>
+        </div>
+        <div class="form-group">
+          <label>Level *</label>
+          <select name="level" required>
+            <option value="department">Department</option>
+            <option value="sub_department">Sub-department</option>
+            <option value="team">Team</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Parent Unit</label>
+          <select name="parent_unit_id"><option value="">None (top-level)</option></select>
+        </div>
+        <div class="form-group full">
+          <label>Manager</label>
+          <select name="manager_id"><option value="">None</option></select>
+        </div>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modal-dept">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-dept">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCRUM TEAM MODAL ────────────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="modal-scrum">
+  <div class="modal">
+    <button class="modal-close" data-close="modal-scrum">×</button>
+    <div class="modal-title" id="modal-scrum-title">New Scrum Team</div>
+    <form id="form-scrum" autocomplete="off">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Team Name *</label>
+          <input name="name" required placeholder="Team Phoenix"/>
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea name="description" placeholder="What does this team own?"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Product Owner</label>
+          <select name="product_owner_id"><option value="">None</option></select>
+        </div>
+        <div class="form-group">
+          <label>Scrum Master</label>
+          <select name="scrum_master_id"><option value="">None</option></select>
+        </div>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modal-scrum">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-scrum">Save Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADD MEMBER MODAL ────────────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="modal-member">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" data-close="modal-member">×</button>
+    <div class="modal-title">Add Team Member</div>
+    <form id="form-member" autocomplete="off">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Employee *</label>
+          <select name="person_id" required><option value="">Select employee…</option></select>
+        </div>
+        <div class="form-group full">
+          <label>Role in Team</label>
+          <select name="role_in_team">
+            <option value="">Not specified</option>
+            <option>Developer</option><option>Senior Developer</option><option>Lead Developer</option>
+            <option>QA Engineer</option><option>DevOps</option><option>Designer</option>
+            <option>Data Engineer</option><option>Product Owner</option>
+            <option>Scrum Master</option><option>Architect</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modal-member">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-member">Add Member</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ───────────────────────────────────────────────────────────────── -->
+<div id="toast"></div>
+
+<script src="/static/hr.js"></script>
+</body>
+</html>
