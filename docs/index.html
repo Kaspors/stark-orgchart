@@ -4,18 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="theme-color" content="#667eea" />
-  <title>Optimistic Weather ☀️</title>
+  <title>The Optimistic Weather App</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤️</text></svg>" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --glass: rgba(255,255,255,0.18);
-      --glass-border: rgba(255,255,255,0.3);
-      --shadow: 0 8px 32px rgba(0,0,0,0.15);
-      --radius: 20px;
-      --radius-sm: 12px;
-    }
 
     html { height: 100%; }
 
@@ -30,264 +22,223 @@
     }
 
     .app {
-      max-width: 430px;
+      max-width: 420px;
       margin: 0 auto;
-      padding: 24px 16px 40px;
+      padding: 40px 24px 60px;
     }
 
-    /* ── Header ── */
-    .header {
+    /* ── Title ── */
+    .title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      opacity: .7;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 28px;
     }
-    .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
-    .header p  { font-size: 13px; opacity: .65; margin-top: 3px; }
 
-    /* ── Search bar ── */
-    .search-row {
+    /* ── Search ── */
+    .search {
       display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
+      align-items: center;
+      background: rgba(255,255,255,.15);
+      border-radius: 14px;
+      padding: 4px 4px 4px 16px;
+      margin-bottom: 40px;
+      border: 1px solid rgba(255,255,255,.2);
     }
-    .search-row input {
+    .search input {
       flex: 1;
-      padding: 13px 16px;
-      border: 1.5px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      background: var(--glass);
-      backdrop-filter: blur(12px);
+      background: none;
+      border: none;
       color: #fff;
       font-size: 16px;
       outline: none;
-      transition: border-color .2s;
+      padding: 8px 0;
     }
-    .search-row input::placeholder { color: rgba(255,255,255,.55); }
-    .search-row input:focus { border-color: rgba(255,255,255,.65); }
-    .icon-btn {
+    .search input::placeholder { color: rgba(255,255,255,.5); }
+    .search-btn {
+      background: rgba(255,255,255,.2);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 18px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 48px;
-      height: 48px;
-      border: 1.5px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      background: var(--glass);
-      backdrop-filter: blur(12px);
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      transition: background .2s;
+      transition: background .15s;
       flex-shrink: 0;
+      margin-left: 4px;
     }
-    .icon-btn:hover  { background: rgba(255,255,255,.28); }
-    .icon-btn:active { background: rgba(255,255,255,.38); }
+    .search-btn:hover  { background: rgba(255,255,255,.3); }
+    .search-btn:active { background: rgba(255,255,255,.4); }
 
     /* ── Loading ── */
     .loading {
       text-align: center;
-      padding: 80px 20px;
+      padding: 80px 0;
     }
     .spinner {
-      width: 44px; height: 44px;
-      border: 3px solid rgba(255,255,255,.25);
+      width: 36px; height: 36px;
+      border: 2.5px solid rgba(255,255,255,.25);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin .9s linear infinite;
-      margin: 0 auto 16px;
+      margin: 0 auto 14px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading p { opacity: .75; font-size: 15px; }
+    .loading p { font-size: 15px; opacity: .65; }
 
     /* ── Error ── */
-    .error-card {
-      background: rgba(255,80,80,.2);
-      border: 1.5px solid rgba(255,120,120,.4);
-      border-radius: var(--radius);
-      padding: 20px;
-      text-align: center;
+    .error-msg {
+      background: rgba(255,80,80,.18);
+      border: 1px solid rgba(255,120,120,.35);
+      border-radius: 14px;
+      padding: 18px 20px;
       font-size: 15px;
       line-height: 1.5;
+      text-align: center;
     }
 
-    /* ── Main weather ── */
-    .weather-hero {
+    /* ── Hero ── */
+    .hero {
       text-align: center;
-      margin-bottom: 20px;
-      padding: 10px 0;
+      padding: 8px 0 32px;
     }
     .hero-icon {
-      font-size: 96px;
+      font-size: 88px;
       line-height: 1;
-      margin-bottom: 4px;
-      filter: drop-shadow(0 6px 12px rgba(0,0,0,.2));
       display: block;
+      margin-bottom: 8px;
     }
     .hero-temp {
-      font-size: 80px;
+      font-size: 86px;
       font-weight: 200;
       letter-spacing: -4px;
       line-height: 1;
     }
+    .hero-desc {
+      font-size: 20px;
+      font-weight: 500;
+      margin-top: 12px;
+      opacity: .95;
+    }
     .hero-feels {
       font-size: 14px;
-      opacity: .7;
-      margin-top: 2px;
-    }
-    .hero-desc {
-      font-size: 22px;
-      font-weight: 500;
-      margin-top: 10px;
+      opacity: .6;
+      margin-top: 3px;
     }
     .hero-location {
-      font-size: 15px;
-      opacity: .75;
+      font-size: 14px;
+      opacity: .7;
+      margin-top: 6px;
+    }
+    .hero-source {
+      font-size: 12px;
+      opacity: .5;
       margin-top: 4px;
     }
-    .optimism-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,.22);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--glass-border);
-      padding: 6px 14px;
-      border-radius: 30px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: .3px;
-      margin-top: 12px;
-      text-transform: uppercase;
-    }
 
-    /* ── Glass card ── */
-    .card {
-      background: var(--glass);
-      backdrop-filter: blur(16px);
-      border: 1.5px solid var(--glass-border);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow);
+    /* ── Stats row ── */
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      padding: 20px 0;
+      border-top: 1px solid rgba(255,255,255,.15);
+      border-bottom: 1px solid rgba(255,255,255,.15);
+      margin-bottom: 32px;
     }
-    .card-label {
+    .stat { text-align: center; }
+    .stat-val  { font-size: 18px; font-weight: 600; }
+    .stat-lbl  { font-size: 11px; opacity: .55; margin-top: 2px; letter-spacing: .3px; }
+
+    /* ── Section label ── */
+    .section-label {
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
-      opacity: .6;
-      margin-bottom: 14px;
+      letter-spacing: 1px;
+      opacity: .5;
+      margin-bottom: 12px;
     }
 
-    /* ── Stats grid ── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    .stat { text-align: center; }
-    .stat-icon  { font-size: 22px; margin-bottom: 3px; }
-    .stat-value { font-size: 22px; font-weight: 600; }
-    .stat-sub   { font-size: 11px; opacity: .65; margin-top: 1px; }
-
-    /* ── Forecast rows ── */
-    .forecast-row {
+    /* ── Forecast ── */
+    .forecast { margin-bottom: 32px; }
+    .fc-row {
       display: flex;
       align-items: center;
-      padding: 7px 0;
+      padding: 10px 0;
       border-bottom: 1px solid rgba(255,255,255,.1);
     }
-    .forecast-row:last-child { border-bottom: none; }
-    .fc-day  { width: 60px; font-size: 14px; font-weight: 500; }
-    .fc-icon { font-size: 24px; flex: 1; text-align: center; }
-    .fc-rain {
-      width: 42px;
-      text-align: center;
-      font-size: 13px;
-      opacity: .75;
-    }
+    .fc-row:last-child { border-bottom: none; }
+    .fc-day   { width: 52px; font-size: 14px; font-weight: 500; }
+    .fc-icon  { font-size: 22px; flex: 1; text-align: center; }
+    .fc-rain  { width: 40px; text-align: center; font-size: 13px; opacity: .65; }
     .fc-temps { text-align: right; }
-    .fc-hi { font-size: 16px; font-weight: 600; }
-    .fc-lo { font-size: 12px; opacity: .55; }
+    .fc-hi    { font-size: 15px; font-weight: 600; }
+    .fc-lo    { font-size: 12px; opacity: .5; }
 
-    /* ── Provider comparison ── */
-    .provider-row {
+    /* ── Sources ── */
+    .sources { margin-bottom: 36px; }
+    .src-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 0;
+      padding: 9px 0;
       border-bottom: 1px solid rgba(255,255,255,.1);
+      font-size: 14px;
     }
-    .provider-row:last-child { border-bottom: none; }
-    .prov-name  { width: 72px; font-size: 13px; opacity: .8; font-weight: 500; }
-    .prov-icon  { font-size: 20px; }
-    .prov-detail { flex: 1; font-size: 14px; }
-    .prov-chosen {
-      background: rgba(255,255,255,.28);
-      border-radius: 20px;
-      padding: 2px 10px;
+    .src-row:last-child { border-bottom: none; }
+    .src-name   { width: 76px; opacity: .75; font-weight: 500; }
+    .src-icon   { font-size: 18px; }
+    .src-detail { flex: 1; }
+    .src-chosen {
       font-size: 11px;
       font-weight: 700;
-      white-space: nowrap;
-    }
-
-    /* ── Optimism bar ── */
-    .optimism-bar-wrap { margin-top: 10px; }
-    .optimism-bar-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
       opacity: .7;
-      margin-bottom: 5px;
-    }
-    .optimism-bar-bg {
-      height: 6px;
       background: rgba(255,255,255,.2);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .optimism-bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      background: linear-gradient(to right, #f8e030, #00e5b0);
-      transition: width 1.2s ease;
+      padding: 2px 8px;
+      border-radius: 20px;
     }
 
-    /* ── Share button ── */
+    /* ── Share ── */
     .share-btn {
       width: 100%;
-      padding: 16px;
-      background: rgba(255,255,255,.22);
-      border: 2px solid rgba(255,255,255,.4);
-      border-radius: var(--radius);
+      padding: 15px;
+      background: rgba(255,255,255,.18);
+      border: 1.5px solid rgba(255,255,255,.35);
+      border-radius: 14px;
       color: #fff;
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
-      backdrop-filter: blur(12px);
-      transition: background .2s, transform .1s;
-      margin-bottom: 12px;
+      transition: background .15s, transform .1s;
       letter-spacing: .2px;
+      margin-bottom: 12px;
     }
-    .share-btn:hover  { background: rgba(255,255,255,.32); }
+    .share-btn:hover  { background: rgba(255,255,255,.27); }
     .share-btn:active { transform: scale(.98); }
 
-    /* ── Last updated ── */
-    .last-updated {
+    /* ── Footer ── */
+    .footer {
       text-align: center;
       font-size: 12px;
-      opacity: .4;
-      margin-top: 4px;
+      opacity: .35;
     }
 
     /* ── Toast ── */
     .toast {
       position: fixed;
-      bottom: 36px;
+      bottom: 32px;
       left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: rgba(20,20,20,.88);
+      transform: translateX(-50%) translateY(70px);
+      background: rgba(15,15,15,.85);
       color: #fff;
-      padding: 12px 22px;
+      padding: 11px 20px;
       border-radius: 30px;
       font-size: 14px;
       font-weight: 500;
@@ -304,85 +255,59 @@
 <body>
 <div class="app">
 
-  <div class="header">
-    <h1>🌤️ Optimistic Weather</h1>
-    <p>The brightest forecast from 4 global models</p>
-  </div>
+  <div class="title">The Optimistic Weather App</div>
 
-  <div class="search-row">
+  <div class="search">
     <input id="cityInput" type="text" placeholder="Search city…" autocomplete="off" />
-    <button class="icon-btn" onclick="searchCity()" title="Search">🔍</button>
-    <button class="icon-btn" onclick="useGPS()" title="Use my location">📍</button>
+    <button class="search-btn" onclick="searchCity()" title="Search">🔍</button>
+    <button class="search-btn" onclick="useGPS()" title="Use my location">📍</button>
   </div>
 
   <div id="loadingDiv" class="loading hidden">
     <div class="spinner"></div>
-    <p>Checking all models for good news…</p>
+    <p>Finding the best forecast…</p>
   </div>
 
-  <div id="errorDiv" class="error-card hidden"></div>
+  <div id="errorDiv" class="error-msg hidden"></div>
 
   <div id="weatherDiv" class="hidden">
 
-    <div class="weather-hero">
+    <div class="hero">
       <span class="hero-icon" id="heroIcon">☀️</span>
       <div class="hero-temp" id="heroTemp">--°</div>
-      <div class="hero-feels" id="heroFeels"></div>
       <div class="hero-desc" id="heroDesc"></div>
+      <div class="hero-feels" id="heroFeels"></div>
       <div class="hero-location" id="heroLocation"></div>
-      <div class="optimism-pill">
-        <span>✨</span>
-        <span id="optimismSource">Most optimistic</span>
+      <div class="hero-source" id="optimismSource"></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val" id="sRain">--</div>
+        <div class="stat-lbl">Rain chance</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="sWind">--</div>
+        <div class="stat-lbl">Wind km/h</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="sRange">--</div>
+        <div class="stat-lbl">Hi / Lo</div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-label">Right Now · Best Case</div>
-      <div class="stats-grid">
-        <div class="stat">
-          <div class="stat-icon">💧</div>
-          <div class="stat-value" id="sPrecip">--</div>
-          <div class="stat-sub">Precip (mm)</div>
-        </div>
-        <div class="stat">
-          <div class="stat-icon">💨</div>
-          <div class="stat-value" id="sWind">--</div>
-          <div class="stat-sub">Wind (km/h)</div>
-        </div>
-        <div class="stat">
-          <div class="stat-icon">🌡️</div>
-          <div class="stat-value" id="sRange">--</div>
-          <div class="stat-sub">Today hi/lo</div>
-        </div>
-        <div class="stat">
-          <div class="stat-icon">🌂</div>
-          <div class="stat-value" id="sRain">--</div>
-          <div class="stat-sub">Rain chance</div>
-        </div>
-      </div>
-      <div class="optimism-bar-wrap">
-        <div class="optimism-bar-label">
-          <span>Optimism score</span>
-          <span id="optimismScore">--/10</span>
-        </div>
-        <div class="optimism-bar-bg">
-          <div class="optimism-bar-fill" id="optimismFill" style="width:0%"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">7-Day Outlook · Optimistic Pick</div>
+    <div class="forecast">
+      <div class="section-label">7-Day Forecast</div>
       <div id="forecastList"></div>
     </div>
 
-    <div class="card">
-      <div class="card-label">All Models · Today</div>
+    <div class="sources">
+      <div class="section-label">Forecast Sources</div>
       <div id="providerList"></div>
     </div>
 
-    <button class="share-btn" onclick="shareWeather()">📤  Share This Forecast</button>
-    <div class="last-updated" id="lastUpdated"></div>
+    <button class="share-btn" onclick="shareWeather()">Share this forecast</button>
+    <div class="footer" id="lastUpdated"></div>
 
   </div>
 </div>
@@ -553,28 +478,21 @@ function render(models) {
   // Hero
   set('heroIcon',    info.i);
   set('heroTemp',    `${Math.round(cur.temperature_2m)}°`);
-  set('heroFeels',   `Feels like ${Math.round(cur.apparent_temperature)}°`);
   set('heroDesc',    info.d);
+  set('heroFeels',   `Feels like ${Math.round(cur.apparent_temperature)}°`);
   set('heroLocation','📍 ' + state.name);
-  set('optimismSource', `✨ ${best._label} · most optimistic`);
+  set('optimismSource', `Best case · ${best._label}`);
 
-  // Stats — always pick the most optimistic value across all models
+  // Stats — most optimistic values across all models
   const validModels = models.filter(m => m.current);
-  const minPrecip   = Math.min(...validModels.map(m => m.current.precipitation ?? Infinity));
-  const minWind     = Math.min(...validModels.map(m => m.current.windspeed_10m  ?? Infinity));
-  const maxHi  = Math.max(...models.filter(m => m.daily?.temperature_2m_max?.[0] != null).map(m => m.daily.temperature_2m_max[0]));
-  const minLo  = Math.min(...models.filter(m => m.daily?.temperature_2m_min?.[0] != null).map(m => m.daily.temperature_2m_min[0]));
-  const minRain = Math.min(...models.filter(m => m.daily?.precipitation_probability_max?.[0] != null).map(m => m.daily.precipitation_probability_max[0]));
+  const minWind  = Math.min(...validModels.map(m => m.current.windspeed_10m ?? Infinity));
+  const maxHi    = Math.max(...models.filter(m => m.daily?.temperature_2m_max?.[0] != null).map(m => m.daily.temperature_2m_max[0]));
+  const minLo    = Math.min(...models.filter(m => m.daily?.temperature_2m_min?.[0] != null).map(m => m.daily.temperature_2m_min[0]));
+  const minRain  = Math.min(...models.filter(m => m.daily?.precipitation_probability_max?.[0] != null).map(m => m.daily.precipitation_probability_max[0]));
 
-  set('sPrecip', isFinite(minPrecip) ? minPrecip.toFixed(1) : '--');
-  set('sWind',   isFinite(minWind)   ? Math.round(minWind)  : '--');
-  set('sRange',  `${isFinite(minLo) ? Math.round(minLo) : '--'}° / ${isFinite(maxHi) ? Math.round(maxHi) : '--'}°`);
-  set('sRain',   isFinite(minRain)   ? Math.round(minRain) + '%' : '--');
-  set('optimismScore', `${info.s}/10`);
-
-  requestAnimationFrame(() => {
-    document.getElementById('optimismFill').style.width = `${Math.max(0, info.s) * 10}%`;
-  });
+  set('sRain',  isFinite(minRain)  ? Math.round(minRain) + '%' : '--');
+  set('sWind',  isFinite(minWind)  ? Math.round(minWind)       : '--');
+  set('sRange', `${isFinite(maxHi) ? Math.round(maxHi) : '--'}° / ${isFinite(minLo) ? Math.round(minLo) : '--'}°`);
 
   // 7-day forecast
   const DAY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -599,7 +517,7 @@ function render(models) {
     const date = new Date(); date.setDate(date.getDate() + i);
     const day  = i === 0 ? 'Today' : DAY[date.getDay()];
     const row  = document.createElement('div');
-    row.className = 'forecast-row';
+    row.className = 'fc-row';
     row.innerHTML =
       `<div class="fc-day">${day}</div>` +
       `<div class="fc-icon">${w.i}</div>` +
@@ -616,15 +534,15 @@ function render(models) {
   pEl.innerHTML = '';
   for (const m of models) {
     if (!m.current) continue;
-    const w  = wmo(m.current.weathercode);
+    const w      = wmo(m.current.weathercode);
     const chosen = m._model === best._model;
-    const row = document.createElement('div');
-    row.className = 'provider-row';
+    const row    = document.createElement('div');
+    row.className = 'src-row';
     row.innerHTML =
-      `<div class="prov-name">${m._label}</div>` +
-      `<div class="prov-icon">${w.i}</div>` +
-      `<div class="prov-detail">${Math.round(m.current.temperature_2m)}° · ${w.d}</div>` +
-      (chosen ? `<div class="prov-chosen">✨ Chosen</div>` : '');
+      `<div class="src-name">${m._label}</div>` +
+      `<div class="src-icon">${w.i}</div>` +
+      `<div class="src-detail">${Math.round(m.current.temperature_2m)}° · ${w.d}</div>` +
+      (chosen ? `<div class="src-chosen">chosen</div>` : '');
     pEl.appendChild(row);
   }
 
@@ -643,9 +561,9 @@ function render(models) {
 function shareWeather() {
   const url = location.href;
   if (navigator.share) {
-    navigator.share({ title: '🌤️ Optimistic Weather', text: `Best forecast for ${state.name}!`, url });
+    navigator.share({ title: 'The Optimistic Weather App', text: `Best forecast for ${state.name}!`, url });
   } else {
-    navigator.clipboard.writeText(url).then(() => toast('📋 Link copied!'));
+    navigator.clipboard.writeText(url).then(() => toast('Link copied!'));
   }
 }
 
