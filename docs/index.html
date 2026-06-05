@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#667eea" />
+  <title>Optimistic Weather ☀️</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤️</text></svg>" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --glass: rgba(255,255,255,0.18);
+      --glass-border: rgba(255,255,255,0.3);
+      --shadow: 0 8px 32px rgba(0,0,0,0.15);
+      --radius: 20px;
+      --radius-sm: 12px;
+    }
+
+    html { height: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100%;
+      background: linear-gradient(160deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
+      color: #fff;
+      transition: background 1.2s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+    .header p  { font-size: 13px; opacity: .65; margin-top: 3px; }
+
+    /* ── Search bar ── */
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .search-row input {
+      flex: 1;
+      padding: 13px 16px;
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .search-row input::placeholder { color: rgba(255,255,255,.55); }
+    .search-row input:focus { border-color: rgba(255,255,255,.65); }
+    .icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover  { background: rgba(255,255,255,.28); }
+    .icon-btn:active { background: rgba(255,255,255,.38); }
+
+    /* ── Loading ── */
+    .loading {
+      text-align: center;
+      padding: 80px 20px;
+    }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(255,255,255,.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p { opacity: .75; font-size: 15px; }
+
+    /* ── Error ── */
+    .error-card {
+      background: rgba(255,80,80,.2);
+      border: 1.5px solid rgba(255,120,120,.4);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* ── Main weather ── */
+    .weather-hero {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 10px 0;
+    }
+    .hero-icon {
+      font-size: 96px;
+      line-height: 1;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,.2));
+      display: block;
+    }
+    .hero-temp {
+      font-size: 80px;
+      font-weight: 200;
+      letter-spacing: -4px;
+      line-height: 1;
+    }
+    .hero-feels {
+      font-size: 14px;
+      opacity: .7;
+      margin-top: 2px;
+    }
+    .hero-desc {
+      font-size: 22px;
+      font-weight: 500;
+      margin-top: 10px;
+    }
+    .hero-location {
+      font-size: 15px;
+      opacity: .75;
+      margin-top: 4px;
+    }
+    .optimism-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,.22);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .3px;
+      margin-top: 12px;
+      text-transform: uppercase;
+    }
+
+    /* ── Glass card ── */
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .card-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      opacity: .6;
+      margin-bottom: 14px;
+    }
+
+    /* ── Stats grid ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .stat { text-align: center; }
+    .stat-icon  { font-size: 22px; margin-bottom: 3px; }
+    .stat-value { font-size: 22px; font-weight: 600; }
+    .stat-sub   { font-size: 11px; opacity: .65; margin-top: 1px; }
+
+    /* ── Forecast rows ── */
+    .forecast-row {
+      display: flex;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .forecast-row:last-child { border-bottom: none; }
+    .fc-day  { width: 60px; font-size: 14px; font-weight: 500; }
+    .fc-icon { font-size: 24px; flex: 1; text-align: center; }
+    .fc-rain {
+      width: 42px;
+      text-align: center;
+      font-size: 13px;
+      opacity: .75;
+    }
+    .fc-temps { text-align: right; }
+    .fc-hi { font-size: 16px; font-weight: 600; }
+    .fc-lo { font-size: 12px; opacity: .55; }
+
+    /* ── Provider comparison ── */
+    .provider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .provider-row:last-child { border-bottom: none; }
+    .prov-name  { width: 72px; font-size: 13px; opacity: .8; font-weight: 500; }
+    .prov-icon  { font-size: 20px; }
+    .prov-detail { flex: 1; font-size: 14px; }
+    .prov-chosen {
+      background: rgba(255,255,255,.28);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── Optimism bar ── */
+    .optimism-bar-wrap { margin-top: 10px; }
+    .optimism-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      opacity: .7;
+      margin-bottom: 5px;
+    }
+    .optimism-bar-bg {
+      height: 6px;
+      background: rgba(255,255,255,.2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .optimism-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(to right, #f8e030, #00e5b0);
+      transition: width 1.2s ease;
+    }
+
+    /* ── Share button ── */
+    .share-btn {
+      width: 100%;
+      padding: 16px;
+      background: rgba(255,255,255,.22);
+      border: 2px solid rgba(255,255,255,.4);
+      border-radius: var(--radius);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: background .2s, transform .1s;
+      margin-bottom: 12px;
+      letter-spacing: .2px;
+    }
+    .share-btn:hover  { background: rgba(255,255,255,.32); }
+    .share-btn:active { transform: scale(.98); }
+
+    /* ── Last updated ── */
+    .last-updated {
+      text-align: center;
+      font-size: 12px;
+      opacity: .4;
+      margin-top: 4px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(20,20,20,.88);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      z-index: 999;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <h1>🌤️ Optimistic Weather</h1>
+    <p>The brightest forecast from 4 global models</p>
+  </div>
+
+  <div class="search-row">
+    <input id="cityInput" type="text" placeholder="Search city…" autocomplete="off" />
+    <button class="icon-btn" onclick="searchCity()" title="Search">🔍</button>
+    <button class="icon-btn" onclick="useGPS()" title="Use my location">📍</button>
+  </div>
+
+  <div id="loadingDiv" class="loading hidden">
+    <div class="spinner"></div>
+    <p>Checking all models for good news…</p>
+  </div>
+
+  <div id="errorDiv" class="error-card hidden"></div>
+
+  <div id="weatherDiv" class="hidden">
+
+    <div class="weather-hero">
+      <span class="hero-icon" id="heroIcon">☀️</span>
+      <div class="hero-temp" id="heroTemp">--°</div>
+      <div class="hero-feels" id="heroFeels"></div>
+      <div class="hero-desc" id="heroDesc"></div>
+      <div class="hero-location" id="heroLocation"></div>
+      <div class="optimism-pill">
+        <span>✨</span>
+        <span id="optimismSource">Most optimistic</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Right Now · Best Case</div>
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="stat-icon">💧</div>
+          <div class="stat-value" id="sPrecip">--</div>
+          <div class="stat-sub">Precip (mm)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-icon">💨</div>
+          <div class="stat-value" id="sWind">--</div>
+          <div class="stat-sub">Wind (km/h)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-icon">🌡️</div>
+          <div class="stat-value" id="sRange">--</div>
+          <div class="stat-sub">Today hi/lo</div>
+        </div>
+        <div class="stat">
+          <div class="stat-icon">🌂</div>
+          <div class="stat-value" id="sRain">--</div>
+          <div class="stat-sub">Rain chance</div>
+        </div>
+      </div>
+      <div class="optimism-bar-wrap">
+        <div class="optimism-bar-label">
+          <span>Optimism score</span>
+          <span id="optimismScore">--/10</span>
+        </div>
+        <div class="optimism-bar-bg">
+          <div class="optimism-bar-fill" id="optimismFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">7-Day Outlook · Optimistic Pick</div>
+      <div id="forecastList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">All Models · Today</div>
+      <div id="providerList"></div>
+    </div>
+
+    <button class="share-btn" onclick="shareWeather()">📤  Share This Forecast</button>
+    <div class="last-updated" id="lastUpdated"></div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Weather code lookup ──────────────────────────────────────────────────────
+const WMO = {
+   0: { d:'Clear sky',           i:'☀️',  s:10 },
+   1: { d:'Mainly clear',        i:'🌤️', s:9  },
+   2: { d:'Partly cloudy',       i:'⛅',  s:7  },
+   3: { d:'Overcast',            i:'☁️',  s:5  },
+  45: { d:'Foggy',               i:'🌫️', s:3  },
+  48: { d:'Icy fog',             i:'🌫️', s:2  },
+  51: { d:'Light drizzle',       i:'🌦️', s:4  },
+  53: { d:'Drizzle',             i:'🌦️', s:3  },
+  55: { d:'Heavy drizzle',       i:'🌧️', s:2  },
+  61: { d:'Light rain',          i:'🌧️', s:3  },
+  63: { d:'Rain',                i:'🌧️', s:2  },
+  65: { d:'Heavy rain',          i:'🌧️', s:1  },
+  71: { d:'Light snow',          i:'🌨️', s:3  },
+  73: { d:'Snow',                i:'❄️',  s:2  },
+  75: { d:'Heavy snow',          i:'❄️',  s:1  },
+  77: { d:'Snow grains',         i:'🌨️', s:2  },
+  80: { d:'Light showers',       i:'🌦️', s:4  },
+  81: { d:'Showers',             i:'🌧️', s:2  },
+  82: { d:'Heavy showers',       i:'⛈️', s:1  },
+  85: { d:'Snow showers',        i:'🌨️', s:2  },
+  86: { d:'Heavy snow showers',  i:'🌨️', s:1  },
+  95: { d:'Thunderstorm',        i:'⛈️', s:0  },
+  96: { d:'Thunderstorm+hail',   i:'⛈️', s:0  },
+  99: { d:'Severe thunderstorm', i:'⛈️', s:0  },
+};
+
+function wmo(code) {
+  return WMO[code] || { d:'Unknown', i:'🌡️', s:5 };
+}
+
+function bgForScore(s) {
+  if (s >= 9) return 'linear-gradient(160deg,#f7b733 0%,#f85c2f 100%)';
+  if (s >= 7) return 'linear-gradient(160deg,#667eea 0%,#764ba2 100%)';
+  if (s >= 5) return 'linear-gradient(160deg,#536976 0%,#292e49 100%)';
+  if (s >= 2) return 'linear-gradient(160deg,#1e3c72 0%,#2a5298 100%)';
+  return 'linear-gradient(160deg,#232526 0%,#414345 100%)';
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+let state = { lat: null, lon: null, name: '' };
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const p = new URLSearchParams(location.search);
+  if (p.get('lat') && p.get('lon')) {
+    state.lat  = parseFloat(p.get('lat'));
+    state.lon  = parseFloat(p.get('lon'));
+    state.name = p.get('name') ? decodeURIComponent(p.get('name')) : coord(state.lat, state.lon);
+    load();
+  } else {
+    useGPS();
+  }
+});
+
+// ── Geolocation ──────────────────────────────────────────────────────────────
+function useGPS() {
+  showLoading();
+  if (!navigator.geolocation) { showError('Geolocation not supported — enter a city name.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      state.lat = pos.coords.latitude;
+      state.lon = pos.coords.longitude;
+      state.name = await reverseLookup(state.lat, state.lon);
+      load();
+    },
+    () => {
+      hideLoading();
+      showError('Could not get GPS position. Enter a city name above.');
+    },
+    { timeout: 8000 }
+  );
+}
+
+async function reverseLookup(lat, lon) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+    const d = await r.json();
+    const a = d.address || {};
+    const city = a.city || a.town || a.village || a.county || '';
+    const cc   = (a.country_code || '').toUpperCase();
+    return city ? `${city}, ${cc}` : coord(lat, lon);
+  } catch { return coord(lat, lon); }
+}
+
+// ── City search ──────────────────────────────────────────────────────────────
+document.getElementById('cityInput').addEventListener('keypress', e => { if (e.key === 'Enter') searchCity(); });
+
+async function searchCity() {
+  const q = document.getElementById('cityInput').value.trim();
+  if (!q) return;
+  showLoading();
+  try {
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=en&format=json`);
+    const d = await r.json();
+    if (!d.results?.length) { showError(`No results for "${q}". Try another city.`); return; }
+    const loc = d.results[0];
+    state.lat  = loc.latitude;
+    state.lon  = loc.longitude;
+    state.name = `${loc.name}, ${(loc.country_code||'').toUpperCase()}`;
+    load();
+  } catch { showError('Search failed — check your connection.'); }
+}
+
+// ── Fetch one Open-Meteo model ───────────────────────────────────────────────
+async function fetchModel(lat, lon, modelId) {
+  const base = 'https://api.open-meteo.com/v1/forecast';
+  const params = [
+    `latitude=${lat}`,
+    `longitude=${lon}`,
+    `current=temperature_2m,apparent_temperature,precipitation,weathercode,windspeed_10m`,
+    `daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max`,
+    `timezone=auto`,
+    `forecast_days=7`,
+    `models=${modelId}`,
+  ].join('&');
+  const r = await fetch(`${base}?${params}`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const d = await r.json();
+  d._model = modelId;
+  return d;
+}
+
+// ── Load all models ───────────────────────────────────────────────────────────
+const MODELS = [
+  { id: 'best_match',    label: 'Best Match'  },
+  { id: 'ecmwf_ifs025', label: 'ECMWF'       },
+  { id: 'gfs_seamless', label: 'GFS'         },
+  { id: 'icon_seamless', label: 'ICON'       },
+];
+
+async function load() {
+  showLoading();
+  const results = await Promise.allSettled(
+    MODELS.map(m => fetchModel(state.lat, state.lon, m.id).then(d => { d._label = m.label; return d; }))
+  );
+  const ok = results.filter(r => r.status === 'fulfilled').map(r => r.value);
+  if (!ok.length) { showError('Could not fetch weather data. Please try again.'); return; }
+  render(ok);
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render(models) {
+  hideLoading();
+
+  // Pick most optimistic current model
+  let best = models[0], bestScore = -Infinity;
+  for (const m of models) {
+    if (!m.current) continue;
+    const s = wmo(m.current.weathercode).s;
+    if (s > bestScore) { bestScore = s; best = m; }
+  }
+
+  const cur  = best.current;
+  const info = wmo(cur.weathercode);
+
+  // Background
+  document.body.style.background = bgForScore(info.s);
+
+  // Hero
+  set('heroIcon',    info.i);
+  set('heroTemp',    `${Math.round(cur.temperature_2m)}°`);
+  set('heroFeels',   `Feels like ${Math.round(cur.apparent_temperature)}°`);
+  set('heroDesc',    info.d);
+  set('heroLocation','📍 ' + state.name);
+  set('optimismSource', `✨ ${best._label} · most optimistic`);
+
+  // Stats — always pick the most optimistic value across all models
+  const validModels = models.filter(m => m.current);
+  const minPrecip   = Math.min(...validModels.map(m => m.current.precipitation ?? Infinity));
+  const minWind     = Math.min(...validModels.map(m => m.current.windspeed_10m  ?? Infinity));
+  const maxHi  = Math.max(...models.filter(m => m.daily?.temperature_2m_max?.[0] != null).map(m => m.daily.temperature_2m_max[0]));
+  const minLo  = Math.min(...models.filter(m => m.daily?.temperature_2m_min?.[0] != null).map(m => m.daily.temperature_2m_min[0]));
+  const minRain = Math.min(...models.filter(m => m.daily?.precipitation_probability_max?.[0] != null).map(m => m.daily.precipitation_probability_max[0]));
+
+  set('sPrecip', isFinite(minPrecip) ? minPrecip.toFixed(1) : '--');
+  set('sWind',   isFinite(minWind)   ? Math.round(minWind)  : '--');
+  set('sRange',  `${isFinite(minLo) ? Math.round(minLo) : '--'}° / ${isFinite(maxHi) ? Math.round(maxHi) : '--'}°`);
+  set('sRain',   isFinite(minRain)   ? Math.round(minRain) + '%' : '--');
+  set('optimismScore', `${info.s}/10`);
+
+  requestAnimationFrame(() => {
+    document.getElementById('optimismFill').style.width = `${Math.max(0, info.s) * 10}%`;
+  });
+
+  // 7-day forecast
+  const DAY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const fEl = document.getElementById('forecastList');
+  fEl.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    let bestCode = null, bestS = -Infinity, hiMax = -Infinity, loMin = Infinity, rainMin = Infinity;
+    for (const m of models) {
+      const d = m.daily;
+      if (!d) continue;
+      const code = d.weathercode?.[i];
+      if (code != null) {
+        const s = wmo(code).s;
+        if (s > bestS) { bestS = s; bestCode = code; }
+      }
+      if (d.temperature_2m_max?.[i] != null && d.temperature_2m_max[i] > hiMax) hiMax = d.temperature_2m_max[i];
+      if (d.temperature_2m_min?.[i] != null && d.temperature_2m_min[i] < loMin) loMin = d.temperature_2m_min[i];
+      if (d.precipitation_probability_max?.[i] != null && d.precipitation_probability_max[i] < rainMin) rainMin = d.precipitation_probability_max[i];
+    }
+    if (bestCode == null) continue;
+    const w    = wmo(bestCode);
+    const date = new Date(); date.setDate(date.getDate() + i);
+    const day  = i === 0 ? 'Today' : DAY[date.getDay()];
+    const row  = document.createElement('div');
+    row.className = 'forecast-row';
+    row.innerHTML =
+      `<div class="fc-day">${day}</div>` +
+      `<div class="fc-icon">${w.i}</div>` +
+      `<div class="fc-rain">${isFinite(rainMin) ? Math.round(rainMin)+'%' : ''}</div>` +
+      `<div class="fc-temps">` +
+        `<div class="fc-hi">${isFinite(hiMax) ? Math.round(hiMax)+'°' : '--'}</div>` +
+        `<div class="fc-lo">${isFinite(loMin) ? Math.round(loMin)+'°' : '--'}</div>` +
+      `</div>`;
+    fEl.appendChild(row);
+  }
+
+  // Provider comparison
+  const pEl = document.getElementById('providerList');
+  pEl.innerHTML = '';
+  for (const m of models) {
+    if (!m.current) continue;
+    const w  = wmo(m.current.weathercode);
+    const chosen = m._model === best._model;
+    const row = document.createElement('div');
+    row.className = 'provider-row';
+    row.innerHTML =
+      `<div class="prov-name">${m._label}</div>` +
+      `<div class="prov-icon">${w.i}</div>` +
+      `<div class="prov-detail">${Math.round(m.current.temperature_2m)}° · ${w.d}</div>` +
+      (chosen ? `<div class="prov-chosen">✨ Chosen</div>` : '');
+    pEl.appendChild(row);
+  }
+
+  // Update URL for sharing
+  const url = new URL(location.href);
+  url.searchParams.set('lat',  state.lat.toFixed(4));
+  url.searchParams.set('lon',  state.lon.toFixed(4));
+  url.searchParams.set('name', encodeURIComponent(state.name));
+  history.replaceState({}, '', url);
+
+  set('lastUpdated', 'Updated ' + new Date().toLocaleTimeString());
+  document.getElementById('weatherDiv').classList.remove('hidden');
+}
+
+// ── Share ─────────────────────────────────────────────────────────────────────
+function shareWeather() {
+  const url = location.href;
+  if (navigator.share) {
+    navigator.share({ title: '🌤️ Optimistic Weather', text: `Best forecast for ${state.name}!`, url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => toast('📋 Link copied!'));
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function set(id, v) { document.getElementById(id).textContent = v; }
+function coord(lat, lon) { return `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`; }
+
+function showLoading() {
+  document.getElementById('loadingDiv').classList.remove('hidden');
+  document.getElementById('weatherDiv').classList.add('hidden');
+  document.getElementById('errorDiv').classList.add('hidden');
+}
+function hideLoading() { document.getElementById('loadingDiv').classList.add('hidden'); }
+function showError(msg) {
+  hideLoading();
+  const el = document.getElementById('errorDiv');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.remove('hidden');
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
