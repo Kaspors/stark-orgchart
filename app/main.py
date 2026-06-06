@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI, UploadFile, File, Depends, HTTPException, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -9,10 +10,19 @@ from .db import SessionLocal, init_db
 from .models import Person, OrgUnit
 from .schemas import PersonCreate, PersonUpdate, PersonOut, OrgUnitOut, TreeNode
 from .routers import employees, departments, scrum_teams, reports
+from .routers import weather_ai
 
 ADMIN_KEY = os.getenv("ADMIN_KEY")
 
 app = FastAPI(title="STARK HR & Org Chart")
+
+# Allow the GitHub Pages frontend (and local dev) to call /api/weather/chat
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # tighten to ["https://kaspors.github.io"] in production
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 init_db()
 
@@ -21,6 +31,7 @@ app.include_router(employees.router)
 app.include_router(departments.router)
 app.include_router(scrum_teams.router)
 app.include_router(reports.router)
+app.include_router(weather_ai.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
