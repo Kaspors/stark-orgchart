@@ -8,7 +8,6 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤️</text></svg>" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { height: 100%; }
 
     body {
@@ -21,330 +20,464 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    .app {
-      max-width: 420px;
-      margin: 0 auto;
-      padding: 40px 24px 60px;
-    }
+    /* ── Layout ── */
+    .app { max-width: 420px; margin: 0 auto; padding: 40px 24px 60px; }
+    .hidden { display: none !important; }
 
     /* ── Title ── */
     .title {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: .5px;
-      text-transform: uppercase;
-      opacity: .7;
-      text-align: center;
-      margin-bottom: 28px;
+      font-size: 15px; font-weight: 600; letter-spacing: .5px;
+      text-transform: uppercase; opacity: .7; text-align: center; margin-bottom: 28px;
     }
 
     /* ── Search ── */
     .search {
-      display: flex;
-      align-items: center;
-      background: rgba(255,255,255,.15);
-      border-radius: 14px;
-      padding: 4px 4px 4px 16px;
-      margin-bottom: 40px;
+      display: flex; align-items: center;
+      background: rgba(255,255,255,.15); border-radius: 14px;
+      padding: 4px 4px 4px 16px; margin-bottom: 40px;
       border: 1px solid rgba(255,255,255,.2);
     }
     .search input {
-      flex: 1;
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 16px;
-      outline: none;
-      padding: 8px 0;
+      flex: 1; background: none; border: none; color: #fff;
+      font-size: 16px; outline: none; padding: 8px 0;
     }
     .search input::placeholder { color: rgba(255,255,255,.5); }
     .search-btn {
-      background: rgba(255,255,255,.2);
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 18px;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .15s;
-      flex-shrink: 0;
-      margin-left: 4px;
+      background: rgba(255,255,255,.2); border: none; border-radius: 10px;
+      color: #fff; font-size: 18px; width: 40px; height: 40px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .15s; flex-shrink: 0; margin-left: 4px;
     }
     .search-btn:hover  { background: rgba(255,255,255,.3); }
     .search-btn:active { background: rgba(255,255,255,.4); }
 
-    /* ── Loading ── */
-    .loading {
-      text-align: center;
-      padding: 80px 0;
-    }
+    /* ── Loading / Error ── */
+    .loading { text-align: center; padding: 80px 0; }
     .spinner {
       width: 36px; height: 36px;
-      border: 2.5px solid rgba(255,255,255,.25);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin .9s linear infinite;
-      margin: 0 auto 14px;
+      border: 2.5px solid rgba(255,255,255,.25); border-top-color: #fff;
+      border-radius: 50%; animation: spin .9s linear infinite; margin: 0 auto 14px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading p { font-size: 15px; opacity: .65; }
-
-    /* ── Error ── */
     .error-msg {
-      background: rgba(255,80,80,.18);
-      border: 1px solid rgba(255,120,120,.35);
-      border-radius: 14px;
-      padding: 18px 20px;
-      font-size: 15px;
-      line-height: 1.5;
-      text-align: center;
+      background: rgba(255,80,80,.18); border: 1px solid rgba(255,120,120,.35);
+      border-radius: 14px; padding: 18px 20px; font-size: 15px;
+      line-height: 1.5; text-align: center;
     }
 
     /* ── Hero ── */
-    .hero {
-      text-align: center;
-      padding: 8px 0 32px;
-    }
-    .hero-icon {
-      font-size: 88px;
-      line-height: 1;
-      display: block;
-      margin-bottom: 8px;
-    }
-    .hero-temp {
-      font-size: 86px;
-      font-weight: 200;
-      letter-spacing: -4px;
-      line-height: 1;
-    }
-    .hero-desc {
-      font-size: 20px;
-      font-weight: 500;
-      margin-top: 12px;
-      opacity: .95;
-    }
-    .hero-feels {
-      font-size: 14px;
-      opacity: .6;
-      margin-top: 3px;
-    }
-    .hero-location {
-      font-size: 14px;
-      opacity: .7;
-      margin-top: 6px;
-    }
-    .hero-source {
-      font-size: 12px;
-      opacity: .5;
-      margin-top: 4px;
-    }
+    .hero { text-align: center; padding: 8px 0 28px; }
+    .hero-icon { font-size: 88px; line-height: 1; display: block; margin-bottom: 8px; }
+    .hero-temp { font-size: 86px; font-weight: 200; letter-spacing: -4px; line-height: 1; }
+    .hero-desc { font-size: 20px; font-weight: 500; margin-top: 12px; }
+    .hero-feels { font-size: 14px; opacity: .6; margin-top: 3px; }
+    .hero-location { font-size: 14px; opacity: .7; margin-top: 6px; }
+    .hero-source { font-size: 12px; opacity: .5; margin-top: 4px; }
 
-    /* ── Stats row ── */
+    /* ── Mode banners ── */
+    .mode-banner {
+      border-radius: 10px; margin-bottom: 16px;
+      padding: 10px 14px; font-size: 13px; line-height: 1.4; text-align: center;
+    }
+    .fixed-banner  { background: rgba(255,200,0,.18); border: 1px solid rgba(255,200,0,.35); }
+    .adjust-banner { background: rgba(100,220,120,.12); border: 1px solid rgba(100,220,120,.3); }
+
+    /* ── Stats ── */
     .stats {
-      display: flex;
-      justify-content: space-around;
+      display: flex; justify-content: space-around;
       padding: 20px 0;
       border-top: 1px solid rgba(255,255,255,.15);
       border-bottom: 1px solid rgba(255,255,255,.15);
       margin-bottom: 32px;
     }
     .stat { text-align: center; }
-    .stat-val  { font-size: 18px; font-weight: 600; }
-    .stat-lbl  { font-size: 11px; opacity: .55; margin-top: 2px; letter-spacing: .3px; }
+    .stat-val { font-size: 18px; font-weight: 600; }
+    .stat-lbl { font-size: 11px; opacity: .55; margin-top: 2px; letter-spacing: .3px; }
 
     /* ── Section label ── */
     .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: .5;
-      margin-bottom: 12px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; opacity: .5; margin-bottom: 12px;
     }
 
     /* ── Forecast ── */
     .forecast { margin-bottom: 32px; }
     .fc-row {
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
+      display: flex; align-items: center; padding: 10px 0;
       border-bottom: 1px solid rgba(255,255,255,.1);
     }
     .fc-row:last-child { border-bottom: none; }
-    .fc-day   { width: 52px; font-size: 14px; font-weight: 500; }
-    .fc-icon  { font-size: 22px; flex: 1; text-align: center; }
-    .fc-rain  { width: 40px; text-align: center; font-size: 13px; opacity: .65; }
+    .fc-day  { width: 52px; font-size: 14px; font-weight: 500; }
+    .fc-icon { font-size: 22px; flex: 1; text-align: center; }
+    .fc-rain { width: 40px; text-align: center; font-size: 13px; opacity: .65; }
     .fc-temps { text-align: right; }
-    .fc-hi    { font-size: 15px; font-weight: 600; }
-    .fc-lo    { font-size: 12px; opacity: .5; }
+    .fc-hi { font-size: 15px; font-weight: 600; }
+    .fc-lo { font-size: 12px; opacity: .5; }
 
     /* ── Sources ── */
-    .sources { margin-bottom: 36px; }
+    .sources { margin-bottom: 28px; }
     .src-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 0;
-      border-bottom: 1px solid rgba(255,255,255,.1);
-      font-size: 14px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.1); font-size: 14px;
     }
     .src-row:last-child { border-bottom: none; }
     .src-name   { width: 76px; opacity: .75; font-weight: 500; }
     .src-icon   { font-size: 18px; }
     .src-detail { flex: 1; }
     .src-chosen {
-      font-size: 11px;
-      font-weight: 700;
-      opacity: .7;
-      background: rgba(255,255,255,.2);
-      padding: 2px 8px;
-      border-radius: 20px;
+      font-size: 11px; font-weight: 700; opacity: .7;
+      background: rgba(255,255,255,.2); padding: 2px 8px; border-radius: 20px;
     }
 
-    /* ── Share ── */
-    .share-btn {
-      width: 100%;
-      padding: 15px;
-      background: rgba(255,255,255,.18);
-      border: 1.5px solid rgba(255,255,255,.35);
-      border-radius: 14px;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .15s, transform .1s;
-      letter-spacing: .2px;
-      margin-bottom: 12px;
+    /* ── Action button row (Fix Weather + Customise Weather) ── */
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .action-btn {
+      padding: 13px 8px; background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.28); border-radius: 14px;
+      color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background .15s, transform .1s; text-align: center;
     }
-    .share-btn:hover  { background: rgba(255,255,255,.27); }
-    .share-btn:active { transform: scale(.98); }
+    .action-btn:hover  { background: rgba(255,255,255,.25); }
+    .action-btn:active { transform: scale(.97); }
+    .action-btn.active {
+      background: rgba(255,255,255,.28);
+      border-color: rgba(255,255,255,.6);
+    }
+
+    /* ── Full-width buttons ── */
+    .full-btn {
+      width: 100%; padding: 15px; background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.3); border-radius: 14px;
+      color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: background .15s, transform .1s; margin-bottom: 10px;
+    }
+    .full-btn:hover  { background: rgba(255,255,255,.25); }
+    .full-btn:active { transform: scale(.98); }
 
     /* ── Footer ── */
-    .footer {
-      text-align: center;
-      font-size: 12px;
-      opacity: .35;
-    }
+    .footer { text-align: center; font-size: 12px; opacity: .35; }
 
     /* ── Toast ── */
     .toast {
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
+      position: fixed; bottom: 32px; left: 50%;
       transform: translateX(-50%) translateY(70px);
-      background: rgba(15,15,15,.85);
-      color: #fff;
-      padding: 11px 20px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 500;
+      background: rgba(15,15,15,.85); color: #fff;
+      padding: 11px 20px; border-radius: 30px; font-size: 14px; font-weight: 500;
       transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-      z-index: 999;
-      pointer-events: none;
-      white-space: nowrap;
+      z-index: 999; pointer-events: none; white-space: nowrap;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
-    .hidden { display: none !important; }
+    /* ═══════════════════════════════════════════════════════════════════
+       DISCLAIMER VIEW
+    ═══════════════════════════════════════════════════════════════════ */
+    #viewDisclaimer {
+      max-width: 420px; margin: 0 auto; padding: 40px 24px 120px;
+    }
+    .disc-eyebrow {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; opacity: .5; text-align: center; margin-bottom: 6px;
+    }
+    .disc-title {
+      font-size: 18px; font-weight: 700; text-align: center;
+      line-height: 1.3; margin-bottom: 4px;
+    }
+    .disc-subtitle {
+      font-size: 11px; opacity: .45; text-align: center; margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .disc-body {
+      font-size: 13px; line-height: 1.75; opacity: .85;
+    }
+    .disc-body h2 {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; opacity: .6; margin: 28px 0 8px;
+    }
+    .disc-body p { margin-bottom: 10px; }
+    .disc-back-wrap {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      padding: 16px 24px 32px;
+      background: linear-gradient(to top, rgba(0,0,0,.4) 0%, transparent 100%);
+    }
+    .disc-back {
+      display: block; width: 100%; max-width: 420px; margin: 0 auto;
+      padding: 15px; background: rgba(255,255,255,.2);
+      border: 1.5px solid rgba(255,255,255,.4); border-radius: 14px;
+      color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+      backdrop-filter: blur(10px); text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       CHAT OVERLAY
+    ═══════════════════════════════════════════════════════════════════ */
+    .chat-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.88); backdrop-filter: blur(10px);
+      z-index: 200; display: flex; flex-direction: column;
+    }
+    .chat-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      flex-shrink: 0;
+    }
+    .chat-header-left { }
+    .chat-title { font-size: 16px; font-weight: 700; }
+    .chat-subtitle { font-size: 12px; opacity: .5; margin-top: 2px; }
+    .chat-close {
+      background: rgba(255,255,255,.15); border: none; border-radius: 50%;
+      width: 34px; height: 34px; color: #fff; font-size: 18px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .chat-body {
+      flex: 1; overflow-y: auto; padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .bubble {
+      max-width: 82%; padding: 12px 16px; border-radius: 18px;
+      font-size: 15px; line-height: 1.45; white-space: pre-wrap;
+    }
+    .bubble-bot  { align-self: flex-start; background: rgba(255,255,255,.14); border-bottom-left-radius: 4px; }
+    .bubble-user { align-self: flex-end; background: rgba(255,255,255,.24); border-bottom-right-radius: 4px; }
+    .bubble-typing { align-self: flex-start; opacity: .5; font-size: 22px; padding: 8px 16px; }
+    .chat-footer { padding: 12px 16px 24px; border-top: 1px solid rgba(255,255,255,.1); flex-shrink: 0; }
+    .chat-input-row { display: flex; gap: 8px; }
+    .chat-input-row input {
+      flex: 1; padding: 13px 16px;
+      background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25);
+      border-radius: 12px; color: #fff; font-size: 16px; outline: none;
+    }
+    .chat-input-row input::placeholder { color: rgba(255,255,255,.4); }
+    .chat-input-row input:disabled { opacity: .4; }
+    .chat-send {
+      width: 50px; height: 50px; background: rgba(255,255,255,.22);
+      border: none; border-radius: 12px; color: #fff; font-size: 22px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background .15s;
+    }
+    .chat-send:hover    { background: rgba(255,255,255,.32); }
+    .chat-send:disabled { opacity: .3; cursor: default; }
+    .chat-done-row { text-align: center; padding: 4px 0; }
+    .chat-done-btn {
+      padding: 14px 36px; background: rgba(255,255,255,.22);
+      border: 1.5px solid rgba(255,255,255,.4); border-radius: 30px;
+      color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
   </style>
 </head>
 <body>
-<div class="app">
 
-  <div class="title">The Optimistic Weather App</div>
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     VIEW: Main weather app
+═══════════════════════════════════════════════════════════════════════════════ -->
+<div id="viewMain">
+  <div class="app">
+    <div class="title">The Optimistic Weather App</div>
 
-  <div class="search">
-    <input id="cityInput" type="text" placeholder="Search city…" autocomplete="off" />
-    <button class="search-btn" onclick="searchCity()" title="Search">🔍</button>
-    <button class="search-btn" onclick="useGPS()" title="Use my location">📍</button>
+    <div class="search">
+      <input id="cityInput" type="text" placeholder="Search city…" autocomplete="off" />
+      <button class="search-btn" onclick="searchCity()" title="Search">🔍</button>
+      <button class="search-btn" onclick="useGPS()" title="Use my location">📍</button>
+    </div>
+
+    <div id="loadingDiv" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Consulting all available sources of hope…</p>
+    </div>
+
+    <div id="errorDiv" class="error-msg hidden"></div>
+
+    <div id="weatherDiv" class="hidden">
+
+      <div class="hero">
+        <span class="hero-icon" id="heroIcon">☀️</span>
+        <div class="hero-temp" id="heroTemp">--°</div>
+        <div class="hero-desc" id="heroDesc"></div>
+        <div class="hero-feels" id="heroFeels"></div>
+        <div class="hero-location" id="heroLocation"></div>
+        <div class="hero-source" id="heroSource"></div>
+      </div>
+
+      <!-- Mode banners: only one shows at a time -->
+      <div id="fixedBanner"  class="mode-banner fixed-banner  hidden"></div>
+      <div id="adjustBanner" class="mode-banner adjust-banner hidden"></div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="sRain">--</div><div class="stat-lbl">Rain chance</div></div>
+        <div class="stat"><div class="stat-val" id="sWind">--</div><div class="stat-lbl">Wind km/h</div></div>
+        <div class="stat"><div class="stat-val" id="sRange">--</div><div class="stat-lbl">Hi / Lo</div></div>
+      </div>
+
+      <div class="forecast">
+        <div class="section-label">7-Day Forecast</div>
+        <div id="forecastList"></div>
+      </div>
+
+      <div class="sources">
+        <div class="section-label">Forecast Sources</div>
+        <div id="providerList"></div>
+      </div>
+
+      <!-- Fix Weather + Customise Weather -->
+      <div class="action-row">
+        <button id="fixBtn"      class="action-btn" onclick="toggleFix()">Fix Weather</button>
+        <button id="customiseBtn" class="action-btn" onclick="openChat()">Customise Weather</button>
+      </div>
+
+      <!-- Share -->
+      <button class="full-btn" onclick="shareWeather()">Share this forecast</button>
+
+      <!-- Remove Liability / T&C — label changes after first view -->
+      <button id="disclaimerBtn" class="full-btn" onclick="showDisclaimer()">Remove Liability</button>
+
+      <div class="footer" id="lastUpdated"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     VIEW: Disclaimer
+═══════════════════════════════════════════════════════════════════════════════ -->
+<div id="viewDisclaimer" class="hidden">
+  <div class="app" style="padding-bottom: 100px;">
+    <div class="disc-eyebrow">Legal Documentation</div>
+    <div class="disc-title">COMPREHENSIVE LIABILITY DISCLAIMER,<br>METEOROLOGICAL NON-WARRANTY,<br>AND FORMAL RENUNCIATION<br>OF CLIMATIC RESPONSIBILITY</div>
+    <div class="disc-subtitle">
+      Effective Date: The moment you opened this app.<br>
+      Version: Definitively Final (Subject to Revision Without Notice).<br>
+      Jurisdiction: Wherever you are standing, which may be indoors.
+    </div>
+
+    <div class="disc-body">
+
+      <h2>1. Parties to This Agreement</h2>
+      <p>This disclaimer is entered into by and between (a) <strong>Kasper and Jan</strong>, two individuals who built a joke weather app and now find themselves in need of legal protection, collectively referred to herein as "The Developers," "The Responsible Parties," or simply "Kasper and Jan"; and (b) you, the user, referred to herein as "The User," "The Hopeful Individual," or "The Person Who Really Should Have Just Checked the National Meteorological Service."</p>
+
+      <h2>2. Nature and Purpose of the Application</h2>
+      <p>The Optimistic Weather App (hereinafter "The App") is a software application designed to present weather forecast data in the most optimistic manner mathematically possible. It is a parody. It is a joke. It is, in the most affectionate and legally careful sense of the word, a bit.</p>
+      <p><strong>The App is not, under any circumstances, a legally binding meteorological instrument.</strong> It does not hold a meteorological licence, has not been certified by any national or international weather authority, and has never been invited to speak at a climate conference. Any resemblance to an actual forecast service, living or dead, is coincidental and slightly alarming.</p>
+
+      <h2>3. Disclaimer of Meteorological Liability</h2>
+      <p>Kasper and Jan hereby disclaim all responsibility, legal, moral, social, or karmic, for the accuracy, inaccuracy, wild inaccuracy, or spectacular wrongness of any forecast presented by The App. This includes but is not limited to:</p>
+      <p><strong>3.1 Precipitation.</strong> Kasper and Jan are not responsible for rain. They are not responsible for drizzle, showers, downpours, sprinkles, mizzle, persistent light rain, brief heavy intervals, or any other variant of water falling from the sky. They are not responsible for the emotional consequence of rain arriving unexpectedly at a point in time when The App suggested it would not. They are not responsible for wet socks. They have never been responsible for wet socks. They will not be responsible for wet socks in the future.</p>
+      <p><strong>3.2 Temperature.</strong> Temperature forecasts presented by The App are aspirational in nature. The phrase "High of 24°C" should be interpreted as "we would very much like it to be 24°C, and at least one weather model agreed with us, briefly." Kasper and Jan are not liable for temperatures that differ from those displayed, regardless of direction, magnitude, or the personal distress caused by discovering it is actually 11°C.</p>
+      <p><strong>3.3 Wind.</strong> Kasper and Jan are not responsible for wind. They cannot control wind. They are not, to their knowledge, in any way affiliated with wind. They are not responsible for hair that has been disrupted, displaced, destroyed, or rendered publicly embarrassing by wind that The App chose not to emphasise.</p>
+      <p><strong>3.4 Other Atmospheric Phenomena.</strong> Kasper and Jan are not responsible for clouds, fog, icy fog, freezing fog, non-freezing fog, hail, hail damage, hail on a barbecue, hail on a recently dried vehicle, humidity, dew point, atmospheric pressure, the feeling that the sky looks a bit threatening even though the app said "mainly clear," or general meteorological spite.</p>
+      <p><strong>3.5 Snow.</strong> Kasper and Jan are not responsible for snow. They are not responsible for light snow, heavy snow, snow grains, snow showers, unexpected snow in April, or the particular emotional devastation of checking The App in the morning and finding it promises "clear sky" only to encounter a meaningful accumulation by lunchtime.</p>
+
+      <h2>4. Disclaimer of Event-Related Liability</h2>
+      <p><strong>4.1 Cancelled Picnics.</strong> Kasper and Jan are not responsible for picnics that were planned on the basis of a forecast from The App and subsequently cancelled, rained upon, blown away, or rendered impractical by conditions that a more conservative weather application might have predicted with considerably greater accuracy.</p>
+      <p><strong>4.2 Failed Barbecues.</strong> Kasper and Jan are expressly, specifically, and with particular emphasis not responsible for barbecues that did not go well. This includes but is not limited to: barbecues rained out, barbecues abandoned mid-sausage, barbecues at which guests arrived in summer attire and were visibly cold, barbecues at which the coals refused to light due to unexpected wind, and barbecues at which someone said "but the app said it would be sunny" in a tone of genuine betrayal. The sausages were always your responsibility. They remain your responsibility. This will not change.</p>
+      <p><strong>4.3 Outdoor Events Generally.</strong> Kasper and Jan are not responsible for: weddings conducted in suboptimal precipitation; outdoor concerts at which the headline act was partially obscured by weather; sports events, festivals, fairs, fetes, markets, marathons, garden parties, outdoor dining experiences, rooftop gatherings, beach trips, park visits, or any other occasion during which weather was a material factor and The App was consulted.</p>
+
+      <h2>5. Disclaimer of Personal Property and Grooming Liability</h2>
+      <p><strong>5.1 Laundry.</strong> Kasper and Jan are not responsible for laundry. They are not responsible for laundry placed outdoors in reliance upon a forecast from The App. They are not responsible for laundry that became wetter than it started, laundry that was retrieved in haste, laundry that was left out overnight because the forecast suggested it would be fine, or laundry that has now been washed three times and still has not dried because it has been raining for four days despite all available optimism.</p>
+      <p><strong>5.2 Hair.</strong> Kasper and Jan are not responsible for ruined hair. They acknowledge that hair is important. They acknowledge that the decision to style one's hair in a particular way is often made in the morning, partly on the basis of weather expectations, and that The App may have contributed to optimism that proved unfounded. They are not liable for this outcome. They are sorry. They cannot say this in court.</p>
+      <p><strong>5.3 Clothing Choices.</strong> Kasper and Jan are not responsible for poor clothing choices made in reliance on The App. This includes sandals worn in rain, coats left at home during unexpected cold, and any garment described afterwards as "completely wrong for the weather."</p>
+
+      <h2>6. Clause on Meteorological Optimism</h2>
+      <p>The App is explicitly and by design optimistic. It selects, from multiple available weather models, the most favourable temperature, the lowest precipitation probability, and the most cheerful weather condition code available. This is not a bug. This is a philosophy.</p>
+      <p>In subscribing to this philosophy, The User acknowledges that optimism is a legitimate response to uncertainty, that weather models are probabilistic in nature, that any single model may be correct on any given day, and that it is at least theoretically possible that The App will be right.</p>
+      <p>Kasper and Jan do not warrant that The App will be right. They hope it will be right. Hope is not a warranty.</p>
+
+      <h2>7. Emotional Dependency Clause</h2>
+      <p>The User acknowledges that The App may, over time, become a source of meteorological comfort. The User may come to rely upon The App for optimism during periods of genuine atmospheric misery. Kasper and Jan are aware of this and are, on a personal level, moved by it.</p>
+      <p>However, Kasper and Jan are not liable for: disappointment caused by reality; the psychological impact of discovering that the weather is significantly worse than displayed; the specific feeling of opening The App in a moment of hope and then looking out of the window; or any emotional dependency on sunshine that was, in retrospect, not meteorologically justified.</p>
+
+      <h2>8. User Responsibilities</h2>
+      <p><strong>The User remains fully and exclusively responsible for checking real weather services before making decisions of material consequence.</strong> This includes but is not limited to: travel decisions, event planning, outdoor catering, purchasing outdoor furniture, scheduling elective surgery in a field, training for or competing in outdoor events, making promises about the weather to other people, or any situation in which being wrong about the weather carries meaningful consequences.</p>
+      <p>Real weather services include but are not limited to: national meteorological offices, certified weather applications, local news services, and looking out of the window.</p>
+
+      <h2>9. Force Majeure</h2>
+      <p>Neither Kasper nor Jan shall be held liable for forecast failures caused by events beyond reasonable control, including but not limited to: unexpected weather, expected weather that nonetheless arrived surprisingly, climate phenomena of unusual severity, the inherent chaos of atmospheric fluid dynamics, and general atmospheric stubbornness.</p>
+
+      <h2>10. Limitation of Liability</h2>
+      <p>To the maximum extent permitted by applicable law, Kasper and Jan's total liability arising from use of The App shall not exceed the amount paid for The App. As The App is free, this amount is zero. Kasper and Jan's liability is therefore zero. This clause has been included for completeness.</p>
+
+      <h2>11. Governing Law</h2>
+      <p>This disclaimer shall be governed by the laws of wherever Kasper and Jan happen to be when this becomes legally relevant, which they sincerely hope is never.</p>
+
+      <h2>12. Acknowledgement</h2>
+      <p>By continuing to use The App, The User acknowledges that they have read this disclaimer, understood its contents, accepted its terms, and are proceeding anyway because the forecast looks genuinely quite good and hope is a powerful motivator.</p>
+      <p>The weather is, in the end, nobody's fault.</p>
+      <p>Good luck out there.</p>
+      <p style="margin-top: 24px; opacity: .5; font-size: 12px;">— Kasper and Jan, The Developers, acting in good faith and with full awareness of the irony.</p>
+    </div>
   </div>
 
-  <div id="loadingDiv" class="loading hidden">
-    <div class="spinner"></div>
-    <p>Finding the best forecast…</p>
+  <div class="disc-back-wrap">
+    <button class="disc-back" onclick="hideDisclaimer()">← Back to the weather</button>
   </div>
+</div>
 
-  <div id="errorDiv" class="error-msg hidden"></div>
-
-  <div id="weatherDiv" class="hidden">
-
-    <div class="hero">
-      <span class="hero-icon" id="heroIcon">☀️</span>
-      <div class="hero-temp" id="heroTemp">--°</div>
-      <div class="hero-desc" id="heroDesc"></div>
-      <div class="hero-feels" id="heroFeels"></div>
-      <div class="hero-location" id="heroLocation"></div>
-      <div class="hero-source" id="optimismSource"></div>
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     OVERLAY: Customise Weather chat
+═══════════════════════════════════════════════════════════════════════════════ -->
+<div id="chatOverlay" class="chat-overlay hidden">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="chat-title">Customise Weather</div>
+      <div class="chat-subtitle">Three questions. Honest answers. Dubious results.</div>
     </div>
-
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-val" id="sRain">--</div>
-        <div class="stat-lbl">Rain chance</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val" id="sWind">--</div>
-        <div class="stat-lbl">Wind km/h</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val" id="sRange">--</div>
-        <div class="stat-lbl">Hi / Lo</div>
-      </div>
+    <button class="chat-close" onclick="closeChat()">✕</button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-footer">
+    <div class="chat-input-row" id="chatInputRow">
+      <input id="chatInput" type="text" placeholder="Type your answer…" autocomplete="off" />
+      <button class="chat-send" id="chatSendBtn" onclick="handleChatSend()">↑</button>
     </div>
-
-    <div class="forecast">
-      <div class="section-label">7-Day Forecast</div>
-      <div id="forecastList"></div>
+    <div class="chat-done-row hidden" id="chatDoneRow">
+      <button class="chat-done-btn" onclick="finishChat()">Apply &amp; Close</button>
     </div>
-
-    <div class="sources">
-      <div class="section-label">Forecast Sources</div>
-      <div id="providerList"></div>
-    </div>
-
-    <button class="share-btn" onclick="shareWeather()">Share this forecast</button>
-    <div class="footer" id="lastUpdated"></div>
-
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIG
+// Point this at wherever your FastAPI backend is running.
+// Local dev: http://localhost:8000
+// Deployed:  https://your-server.example.com
+// ─────────────────────────────────────────────────────────────────────────────
+const BACKEND_URL = 'http://localhost:8000';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WMO WEATHER CODE LOOKUP
+// score (s) = optimism rating; higher = better weather
+// ─────────────────────────────────────────────────────────────────────────────
 const WMO = {
-   0: { d:'Clear sky',           i:'☀️',  s:10 },
-   1: { d:'Mainly clear',        i:'🌤️', s:9  },
-   2: { d:'Partly cloudy',       i:'⛅',  s:7  },
-   3: { d:'Overcast',            i:'☁️',  s:5  },
-  45: { d:'Foggy',               i:'🌫️', s:3  },
-  48: { d:'Icy fog',             i:'🌫️', s:2  },
-  51: { d:'Light drizzle',       i:'🌦️', s:4  },
-  53: { d:'Drizzle',             i:'🌦️', s:3  },
-  55: { d:'Heavy drizzle',       i:'🌧️', s:2  },
-  61: { d:'Light rain',          i:'🌧️', s:3  },
-  63: { d:'Rain',                i:'🌧️', s:2  },
-  65: { d:'Heavy rain',          i:'🌧️', s:1  },
-  71: { d:'Light snow',          i:'🌨️', s:3  },
-  73: { d:'Snow',                i:'❄️',  s:2  },
-  75: { d:'Heavy snow',          i:'❄️',  s:1  },
-  77: { d:'Snow grains',         i:'🌨️', s:2  },
-  80: { d:'Light showers',       i:'🌦️', s:4  },
-  81: { d:'Showers',             i:'🌧️', s:2  },
-  82: { d:'Heavy showers',       i:'⛈️', s:1  },
-  85: { d:'Snow showers',        i:'🌨️', s:2  },
-  86: { d:'Heavy snow showers',  i:'🌨️', s:1  },
-  95: { d:'Thunderstorm',        i:'⛈️', s:0  },
-  96: { d:'Thunderstorm+hail',   i:'⛈️', s:0  },
-  99: { d:'Severe thunderstorm', i:'⛈️', s:0  },
+   0: { d: 'Clear sky',           i: '☀️',  s: 10 },
+   1: { d: 'Mainly clear',        i: '🌤️', s: 9  },
+   2: { d: 'Partly cloudy',       i: '⛅',  s: 7  },
+   3: { d: 'Overcast',            i: '☁️',  s: 5  },
+  45: { d: 'Foggy',               i: '🌫️', s: 3  },
+  48: { d: 'Icy fog',             i: '🌫️', s: 2  },
+  51: { d: 'Light drizzle',       i: '🌦️', s: 4  },
+  53: { d: 'Drizzle',             i: '🌦️', s: 3  },
+  55: { d: 'Heavy drizzle',       i: '🌧️', s: 2  },
+  61: { d: 'Light rain',          i: '🌧️', s: 3  },
+  63: { d: 'Rain',                i: '🌧️', s: 2  },
+  65: { d: 'Heavy rain',          i: '🌧️', s: 1  },
+  71: { d: 'Light snow',          i: '🌨️', s: 3  },
+  73: { d: 'Snow',                i: '❄️',  s: 2  },
+  75: { d: 'Heavy snow',          i: '❄️',  s: 1  },
+  77: { d: 'Snow grains',         i: '🌨️', s: 2  },
+  80: { d: 'Light showers',       i: '🌦️', s: 4  },
+  81: { d: 'Showers',             i: '🌧️', s: 2  },
+  82: { d: 'Heavy showers',       i: '⛈️', s: 1  },
+  85: { d: 'Snow showers',        i: '🌨️', s: 2  },
+  86: { d: 'Heavy snow showers',  i: '🌨️', s: 1  },
+  95: { d: 'Thunderstorm',        i: '⛈️', s: 0  },
+  96: { d: 'Thunderstorm+hail',   i: '⛈️', s: 0  },
+  99: { d: 'Severe thunderstorm', i: '⛈️', s: 0  },
 };
 
-function wmo(code) {
-  return WMO[code] || { d:'Unknown', i:'🌡️', s:5 };
-}
+function wmo(code) { return WMO[code] || { d: 'Unknown', i: '🌡️', s: 5 }; }
 
 function bgForScore(s) {
   if (s >= 9) return 'linear-gradient(160deg,#f7b733 0%,#f85c2f 100%)';
@@ -354,15 +487,506 @@ function bgForScore(s) {
   return 'linear-gradient(160deg,#232526 0%,#414345 100%)';
 }
 
-let state = { lat: null, lon: null, name: '' };
+// ─────────────────────────────────────────────────────────────────────────────
+// APP STATE — single source of truth; rawModels is never mutated after fetch
+// ─────────────────────────────────────────────────────────────────────────────
+const state = {
+  lat: null, lon: null, name: '',
 
+  // Raw responses from all four weather models — treat as immutable
+  rawModels: null,
+
+  // AI-generated adjustment applied on top of the optimistic aggregation.
+  // { temperatureAdjustmentCelsius, precipitationAdjustmentPercentage,
+  //   summary, tone, activityHint }
+  adjustment: null,
+
+  // Fix Weather mode: completely overrides the display with ideal weather.
+  // Fix always beats adjustment; Unfix always returns to raw+adjustment.
+  isFixed: false,
+
+  // Whether the disclaimer has been viewed at least once.
+  // Controls button label: "Remove Liability" → "T&C"
+  disclaimerSeen: false,
+
+  // Chat session (resets each time the overlay opens)
+  chat: {
+    step: 0,        // 0=idle, 1=q1, 2=q2, 3=q3, 4=done
+    answers: [],    // user's three answers
+    followups: [],  // two follow-up questions from GPT
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACTIVITY PRESETS — used by Fix Weather when a user profile is known.
+// If no profile, the default preset applies.
+// Joke note: the barbecue preset is non-negotiable.
+// ─────────────────────────────────────────────────────────────────────────────
+const PRESETS = {
+  default:  { hi: 25, lo: 19, rain: 0,  code: 0,  wind: 8,  label: 'Administratively corrected',  quip: 'Weather has been officially fixed. No further action required.' },
+  skiing:   { hi: -2, lo:-12, rain: 0,  code: 71, wind: 5,  label: 'Ski conditions',               quip: 'Fresh powder confirmed. Frostbite disclaimer applies separately.' },
+  festival: { hi: 22, lo: 14, rain: 5,  code: 1,  wind: 10, label: 'Festival conditions',          quip: 'Warm, clear, acoustically ideal. Mud risk redacted.' },
+  barbecue: { hi: 28, lo: 18, rain: 0,  code: 0,  wind: 5,  label: 'Barbecue conditions',          quip: 'No clouds detected. Sausages may proceed. This is non-negotiable.' },
+  beach:    { hi: 30, lo: 22, rain: 2,  code: 0,  wind: 12, label: 'Beach conditions',             quip: 'UV index: elevated. Sunscreen: your responsibility entirely.' },
+  running:  { hi: 16, lo: 10, rain: 5,  code: 1,  wind: 8,  label: 'Running conditions',           quip: 'Crisp and motivating. Suspiciously so.' },
+  hiking:   { hi: 20, lo: 12, rain: 8,  code: 2,  wind: 10, label: 'Hiking conditions',            quip: 'Brisk. Clear. A mild existential breeze from the west.' },
+};
+
+function getPresetForActivity(hint) {
+  const h = (hint || '').toLowerCase();
+  if (/\bski(ing)?\b|slope|powder|snowboard/.test(h))      return PRESETS.skiing;
+  if (/festival|concert|music\s+\bevent|outdoor\s+show/.test(h)) return PRESETS.festival;
+  if (/barbecue|bbq|grill(ing)?|sausage|burger|braai/.test(h))   return PRESETS.barbecue;
+  if (/beach|swim(ming)?|surf(ing)?|sunbathe|seaside/.test(h))   return PRESETS.beach;
+  if (/\brun(ning)?\b|jog(ging)?|marathon|5k|10k|\brace\b/.test(h)) return PRESETS.running;
+  if (/\bhike?\b|hiking|trekking|trail|hill\s+walk/.test(h))      return PRESETS.hiking;
+  return PRESETS.default;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OPTIMISTIC AGGREGATION — explicit, well-named functions.
+//
+// The core philosophy: given multiple weather models, we always take the reading
+// that paints the nicest picture. This is statistically defensible because
+// one of the models might be right.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Returns the WMO code with the highest optimism score across all models for day i.
+// We ask: "which model thinks today will be nicest?" and trust that model.
+function bestWeatherCodeForDay(models, i) {
+  let bestCode = 0, bestScore = -Infinity;
+  for (const m of models) {
+    const code = m.daily?.weathercode?.[i];
+    if (code != null) {
+      const s = wmo(code).s;
+      if (s > bestScore) { bestScore = s; bestCode = code; }
+    }
+  }
+  return bestCode;
+}
+
+// Returns the highest daily maximum temperature across all models for day i.
+// If one model thinks it'll be warmer, we choose to believe that model.
+function highestMaxTempForDay(models, i) {
+  const vals = models
+    .filter(m => m.daily?.temperature_2m_max?.[i] != null)
+    .map(m => m.daily.temperature_2m_max[i]);
+  return vals.length ? Math.max(...vals) : null;
+}
+
+// Returns the lowest daily minimum temperature across all models for day i.
+// The least cold night wins. Optimism is thermodynamic.
+function lowestMinTempForDay(models, i) {
+  const vals = models
+    .filter(m => m.daily?.temperature_2m_min?.[i] != null)
+    .map(m => m.daily.temperature_2m_min[i]);
+  return vals.length ? Math.min(...vals) : null;
+}
+
+// Returns the lowest precipitation probability across all models for day i.
+// We select the model most confident that it will not rain.
+function lowestPrecipForDay(models, i) {
+  const vals = models
+    .filter(m => m.daily?.precipitation_probability_max?.[i] != null)
+    .map(m => m.daily.precipitation_probability_max[i]);
+  return vals.length ? Math.min(...vals) : null;
+}
+
+// For current conditions: pick the model with the best weather code,
+// then use the most optimistic temperature and the least wind.
+function mostOptimisticCurrentModel(models) {
+  const valid = models.filter(m => m.current);
+  if (!valid.length) return null;
+  let best = valid[0], bestScore = -Infinity;
+  for (const m of valid) {
+    const s = wmo(m.current.weathercode).s;
+    if (s > bestScore) { bestScore = s; best = m; }
+  }
+  return best;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER PIPELINE
+// Call rerenderWeather() whenever state changes that affects the display.
+// Never mutates state.rawModels.
+// ─────────────────────────────────────────────────────────────────────────────
+function rerenderWeather() {
+  if (!state.rawModels) return;
+
+  if (state.isFixed) {
+    renderFixed();
+  } else {
+    renderOptimistic(state.rawModels, state.adjustment);
+  }
+
+  updateBanners();
+  updateButtonStates();
+  document.getElementById('weatherDiv').classList.remove('hidden');
+}
+
+function renderFixed() {
+  const activity = state.adjustment?.activityHint || '';
+  const p = getPresetForActivity(activity);
+  const w = wmo(p.code);
+
+  document.body.style.background = bgForScore(wmo(p.code).s);
+  set('heroIcon',    w.i);
+  set('heroTemp',    `${p.hi}°`);
+  set('heroDesc',    w.d);
+  set('heroFeels',   `Feels like ${p.hi - 2}°`);
+  set('heroLocation','📍 ' + state.name);
+  set('heroSource',  p.quip);
+  set('sRain',  `${p.rain}%`);
+  set('sWind',  `${p.wind}`);
+  set('sRange', `${p.hi}° / ${p.lo}°`);
+
+  const DAY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const fEl = document.getElementById('forecastList');
+  fEl.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(); date.setDate(date.getDate() + i);
+    const day = i === 0 ? 'Today' : DAY[date.getDay()];
+    const row = document.createElement('div');
+    row.className = 'fc-row';
+    row.innerHTML =
+      `<div class="fc-day">${day}</div>` +
+      `<div class="fc-icon">${w.i}</div>` +
+      `<div class="fc-rain">${p.rain}%</div>` +
+      `<div class="fc-temps"><div class="fc-hi">${p.hi}°</div><div class="fc-lo">${p.lo}°</div></div>`;
+    fEl.appendChild(row);
+  }
+
+  const pEl = document.getElementById('providerList');
+  pEl.innerHTML = '<div class="src-row" style="opacity:.45;font-style:italic;font-size:13px;">Reality suppressed. Data irrelevant.</div>';
+}
+
+function renderOptimistic(models, adj) {
+  const bestModel = mostOptimisticCurrentModel(models);
+  if (!bestModel) return;
+
+  const cur = bestModel.current;
+  const info = wmo(cur.weathercode);
+
+  // Use highest temperature and lowest wind across all models
+  const validModels = models.filter(m => m.current);
+  const maxTemp    = Math.max(...validModels.map(m => m.current.temperature_2m));
+  const maxFeels   = Math.max(...validModels.map(m => m.current.apparent_temperature));
+  const minWind    = Math.min(...validModels.map(m => m.current.windspeed_10m ?? Infinity));
+
+  const todayHi   = highestMaxTempForDay(models, 0);
+  const todayLo   = lowestMinTempForDay(models, 0);
+  const todayRain = lowestPrecipForDay(models, 0);
+
+  // Apply ChatGPT adjustment on top (never mutates rawModels)
+  const dT = adj?.temperatureAdjustmentCelsius   || 0;
+  const dR = adj?.precipitationAdjustmentPercentage || 0;
+
+  const dispTemp  = Math.round(maxTemp + dT);
+  const dispFeels = Math.round(maxFeels + dT);
+  const dispHi    = todayHi   != null ? Math.round(todayHi + dT) : null;
+  const dispLo    = todayLo   != null ? Math.round(todayLo + dT) : null;
+  const dispRain  = todayRain != null ? clamp(Math.round(todayRain + dR), 0, 100) : null;
+  const dispWind  = isFinite(minWind) ? Math.round(minWind) : null;
+
+  document.body.style.background = bgForScore(info.s);
+  set('heroIcon',    info.i);
+  set('heroTemp',    `${dispTemp}°`);
+  set('heroDesc',    info.d);
+  set('heroFeels',   `Feels like ${dispFeels}°`);
+  set('heroLocation','📍 ' + state.name);
+  set('heroSource',  adj
+    ? `${adj.summary || 'Adjusted'} · ${adj.tone || 'optimistic'}`
+    : `Best case · ${bestModel._label}`);
+
+  set('sRain',  dispRain != null ? `${dispRain}%` : '--');
+  set('sWind',  dispWind != null ? `${dispWind}` : '--');
+  set('sRange', `${dispHi != null ? dispHi : '--'}° / ${dispLo != null ? dispLo : '--'}°`);
+
+  // 7-day forecast
+  const DAY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const fEl = document.getElementById('forecastList');
+  fEl.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const code = bestWeatherCodeForDay(models, i);
+    const w    = wmo(code);
+    const hi   = highestMaxTempForDay(models, i);
+    const lo   = lowestMinTempForDay(models, i);
+    const rain = lowestPrecipForDay(models, i);
+
+    const dhi   = hi   != null ? Math.round(hi   + dT) : null;
+    const dlo   = lo   != null ? Math.round(lo   + dT) : null;
+    const drain = rain != null ? clamp(Math.round(rain + dR), 0, 100) : null;
+
+    const date = new Date(); date.setDate(date.getDate() + i);
+    const day  = i === 0 ? 'Today' : DAY[date.getDay()];
+    const row  = document.createElement('div');
+    row.className = 'fc-row';
+    row.innerHTML =
+      `<div class="fc-day">${day}</div>` +
+      `<div class="fc-icon">${w.i}</div>` +
+      `<div class="fc-rain">${drain != null ? drain + '%' : ''}</div>` +
+      `<div class="fc-temps"><div class="fc-hi">${dhi != null ? dhi + '°' : '--'}</div><div class="fc-lo">${dlo != null ? dlo + '°' : '--'}</div></div>`;
+    fEl.appendChild(row);
+  }
+
+  // Provider comparison
+  const pEl = document.getElementById('providerList');
+  pEl.innerHTML = '';
+  for (const m of models) {
+    if (!m.current) continue;
+    const w = wmo(m.current.weathercode);
+    const chosen = m._model === bestModel._model;
+    const row = document.createElement('div');
+    row.className = 'src-row';
+    row.innerHTML =
+      `<div class="src-name">${m._label}</div>` +
+      `<div class="src-icon">${w.i}</div>` +
+      `<div class="src-detail">${Math.round(m.current.temperature_2m)}° · ${w.d}</div>` +
+      (chosen ? `<div class="src-chosen">chosen</div>` : '');
+    pEl.appendChild(row);
+  }
+}
+
+function updateBanners() {
+  const fb = document.getElementById('fixedBanner');
+  const ab = document.getElementById('adjustBanner');
+
+  if (state.isFixed) {
+    const preset = getPresetForActivity(state.adjustment?.activityHint || '');
+    fb.textContent = `⚙️ Weather overridden: ${preset.label}. Reality temporarily suspended.`;
+    fb.classList.remove('hidden');
+    ab.classList.add('hidden');
+  } else if (state.adjustment) {
+    ab.textContent = `✨ ${state.adjustment.summary || 'Forecast adjusted.'} (${state.adjustment.tone || 'optimistic'})`;
+    ab.classList.remove('hidden');
+    fb.classList.add('hidden');
+  } else {
+    fb.classList.add('hidden');
+    ab.classList.add('hidden');
+  }
+}
+
+function updateButtonStates() {
+  const fixBtn = document.getElementById('fixBtn');
+  fixBtn.textContent = state.isFixed ? 'Unfix Weather' : 'Fix Weather';
+  fixBtn.classList.toggle('active', state.isFixed);
+
+  document.getElementById('customiseBtn').classList.toggle('active', !!state.adjustment && !state.isFixed);
+  document.getElementById('disclaimerBtn').textContent = state.disclaimerSeen ? 'T&C' : 'Remove Liability';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FIX WEATHER
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleFix() {
+  state.isFixed = !state.isFixed;
+  rerenderWeather();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DISCLAIMER VIEW
+// ─────────────────────────────────────────────────────────────────────────────
+function showDisclaimer() {
+  document.getElementById('viewMain').classList.add('hidden');
+  document.getElementById('viewDisclaimer').classList.remove('hidden');
+  window.scrollTo(0, 0);
+}
+
+function hideDisclaimer() {
+  state.disclaimerSeen = true;
+  document.getElementById('viewDisclaimer').classList.add('hidden');
+  document.getElementById('viewMain').classList.remove('hidden');
+  updateButtonStates();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CUSTOMISE WEATHER — chat flow
+// ─────────────────────────────────────────────────────────────────────────────
+const Q1 = 'Why did you check the weather today?';
+
+function openChat() {
+  state.chat = { step: 1, answers: [], followups: [] };
+
+  const body = document.getElementById('chatBody');
+  body.innerHTML = '';
+  document.getElementById('chatInputRow').classList.remove('hidden');
+  document.getElementById('chatDoneRow').classList.add('hidden');
+  document.getElementById('chatInput').value = '';
+  document.getElementById('chatInput').disabled = false;
+  document.getElementById('chatSendBtn').disabled = false;
+  document.getElementById('chatOverlay').classList.remove('hidden');
+
+  addBubble('bot', Q1);
+  setTimeout(() => document.getElementById('chatInput').focus(), 150);
+}
+
+function closeChat() {
+  document.getElementById('chatOverlay').classList.add('hidden');
+}
+
+function finishChat() {
+  closeChat();
+  rerenderWeather();
+}
+
+document.getElementById('chatInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') handleChatSend();
+});
+
+async function handleChatSend() {
+  const input = document.getElementById('chatInput');
+  const answer = input.value.trim();
+  if (!answer || state.chat.step === 0 || state.chat.step === 4) return;
+
+  input.value = '';
+  addBubble('user', answer);
+  state.chat.answers.push(answer);
+  setChatInputEnabled(false);
+
+  const step = state.chat.step;
+
+  if (step === 1) {
+    // After Q1: get two follow-up questions from GPT
+    addTypingIndicator();
+    try {
+      const questions = await fetchFollowupQuestions(answer);
+      state.chat.followups = questions.length >= 2 ? questions : [
+        'What time of day matters most for your plans?',
+        'How would bad weather affect what you have planned?',
+      ];
+      removeTypingIndicator();
+      addBubble('bot', state.chat.followups[0]);
+      state.chat.step = 2;
+      setChatInputEnabled(true);
+    } catch (err) {
+      removeTypingIndicator();
+      addBubble('bot', `⚠️ ${err.message}\n\nCustomise Weather needs the backend running. Check the README. For now, your forecast stays maximally optimistic.`);
+      showChatDone();
+    }
+
+  } else if (step === 2) {
+    // After Q2: ask Q3
+    addBubble('bot', state.chat.followups[1]);
+    state.chat.step = 3;
+    setChatInputEnabled(true);
+
+  } else if (step === 3) {
+    // After Q3: get the forecast adjustment
+    addTypingIndicator();
+    try {
+      const adj = await fetchAdjustment();
+      state.adjustment = adj;
+      removeTypingIndicator();
+
+      const dT = adj.temperatureAdjustmentCelsius   || 0;
+      const dR = adj.precipitationAdjustmentPercentage || 0;
+      const signT = dT >= 0 ? '+' : '';
+      const signR = dR >= 0 ? '+' : '';
+      addBubble('bot',
+        `${adj.summary || 'Forecast updated.'}\n\n` +
+        `Temperature: ${signT}${dT}°C  ·  Rain: ${signR}${dR}%\n` +
+        `Tone: ${adj.tone || 'optimistic'}`
+      );
+      state.chat.step = 4;
+      showChatDone();
+    } catch (err) {
+      removeTypingIndicator();
+      addBubble('bot', `⚠️ Adjustment failed: ${err.message}\nYour forecast remains stubbornly optimistic.`);
+      showChatDone();
+    }
+  }
+}
+
+async function fetchFollowupQuestions(answer) {
+  const content =
+    `The user answered Q1 ("${Q1}") with: "${answer}"\n\n` +
+    `Generate two personalised follow-up questions to better understand their outdoor plans.`;
+  const reply = await callBackend([{ role: 'user', content }]);
+  const parsed = JSON.parse(reply);
+  return Array.isArray(parsed.questions) ? parsed.questions : [];
+}
+
+async function fetchAdjustment() {
+  const [a1, a2, a3] = state.chat.answers;
+  const [q2, q3]     = state.chat.followups;
+  const content =
+    `User answered three questions:\n\n` +
+    `Q1: ${Q1}\nA1: ${a1}\n\n` +
+    `Q2: ${q2 || '–'}\nA2: ${a2 || '–'}\n\n` +
+    `Q3: ${q3 || '–'}\nA3: ${a3 || '–'}\n\n` +
+    `Generate a forecast adjustment JSON object.`;
+  const reply = await callBackend([{ role: 'user', content }]);
+  return JSON.parse(reply);
+}
+
+async function callBackend(messages) {
+  const res = await fetch(`${BACKEND_URL}/api/weather/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Backend error ${res.status}`);
+  }
+  return (await res.json()).reply;
+}
+
+// ── Chat UI helpers ──
+function addBubble(type, text) {
+  const el = document.createElement('div');
+  el.className = `bubble bubble-${type}`;
+  el.textContent = text;
+  document.getElementById('chatBody').appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function addTypingIndicator() {
+  const el = document.createElement('div');
+  el.id = 'chatTyping';
+  el.className = 'bubble-typing';
+  el.textContent = '···';
+  document.getElementById('chatBody').appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function removeTypingIndicator() {
+  document.getElementById('chatTyping')?.remove();
+}
+
+function setChatInputEnabled(on) {
+  document.getElementById('chatInput').disabled = !on;
+  document.getElementById('chatSendBtn').disabled = !on;
+  if (on) document.getElementById('chatInput').focus();
+}
+
+function showChatDone() {
+  document.getElementById('chatInputRow').classList.add('hidden');
+  document.getElementById('chatDoneRow').classList.remove('hidden');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SHARE
+// ─────────────────────────────────────────────────────────────────────────────
+function shareWeather() {
+  const url = location.href;
+  if (navigator.share) {
+    navigator.share({ title: 'The Optimistic Weather App', text: `Best case forecast for ${state.name}!`, url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => toast('Link copied!'));
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LOCATION & DATA FETCHING
+// ─────────────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   const p = new URLSearchParams(location.search);
   if (p.get('lat') && p.get('lon')) {
     state.lat  = parseFloat(p.get('lat'));
     state.lon  = parseFloat(p.get('lon'));
     state.name = p.get('name') ? decodeURIComponent(p.get('name')) : coord(state.lat, state.lon);
-    load();
+    loadForecast();
   } else {
     useGPS();
   }
@@ -373,15 +997,12 @@ function useGPS() {
   if (!navigator.geolocation) { showError('Geolocation not supported — enter a city name.'); return; }
   navigator.geolocation.getCurrentPosition(
     async pos => {
-      state.lat = pos.coords.latitude;
-      state.lon = pos.coords.longitude;
+      state.lat  = pos.coords.latitude;
+      state.lon  = pos.coords.longitude;
       state.name = await reverseLookup(state.lat, state.lon);
-      load();
+      loadForecast();
     },
-    () => {
-      hideLoading();
-      showError('Could not get GPS position. Enter a city name above.');
-    },
+    () => { hideLoading(); showError('Could not get GPS position. Enter a city name above.'); },
     { timeout: 8000 }
   );
 }
@@ -410,128 +1031,47 @@ async function searchCity() {
     const loc = d.results[0];
     state.lat  = loc.latitude;
     state.lon  = loc.longitude;
-    state.name = `${loc.name}, ${(loc.country_code||'').toUpperCase()}`;
-    load();
+    state.name = `${loc.name}, ${(loc.country_code || '').toUpperCase()}`;
+    loadForecast();
   } catch { showError('Search failed — check your connection.'); }
 }
 
+const MODELS = [
+  { id: 'best_match',    label: 'Best Match' },
+  { id: 'ecmwf_ifs025', label: 'ECMWF'      },
+  { id: 'gfs_seamless', label: 'GFS'        },
+  { id: 'icon_seamless', label: 'ICON'      },
+];
+
 async function fetchModel(lat, lon, modelId) {
-  const base = 'https://api.open-meteo.com/v1/forecast';
   const params = [
-    `latitude=${lat}`,
-    `longitude=${lon}`,
+    `latitude=${lat}`, `longitude=${lon}`,
     `current=temperature_2m,apparent_temperature,precipitation,weathercode,windspeed_10m`,
     `daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max`,
-    `timezone=auto`,
-    `forecast_days=7`,
-    `models=${modelId}`,
+    `timezone=auto`, `forecast_days=7`, `models=${modelId}`,
   ].join('&');
-  const r = await fetch(`${base}?${params}`);
+  const r = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const d = await r.json();
   d._model = modelId;
   return d;
 }
 
-const MODELS = [
-  { id: 'best_match',    label: 'Best Match'  },
-  { id: 'ecmwf_ifs025', label: 'ECMWF'       },
-  { id: 'gfs_seamless', label: 'GFS'         },
-  { id: 'icon_seamless', label: 'ICON'       },
-];
-
-async function load() {
+async function loadForecast() {
   showLoading();
+  // Clear any previous adjustment when loading new location
+  state.adjustment = null;
+  state.isFixed    = false;
+
   const results = await Promise.allSettled(
     MODELS.map(m => fetchModel(state.lat, state.lon, m.id).then(d => { d._label = m.label; return d; }))
   );
   const ok = results.filter(r => r.status === 'fulfilled').map(r => r.value);
   if (!ok.length) { showError('Could not fetch weather data. Please try again.'); return; }
-  render(ok);
-}
 
-function render(models) {
-  hideLoading();
+  state.rawModels = ok;   // store; never mutate this reference
 
-  let best = models[0], bestScore = -Infinity;
-  for (const m of models) {
-    if (!m.current) continue;
-    const s = wmo(m.current.weathercode).s;
-    if (s > bestScore) { bestScore = s; best = m; }
-  }
-
-  const cur  = best.current;
-  const info = wmo(cur.weathercode);
-
-  document.body.style.background = bgForScore(info.s);
-
-  set('heroIcon',    info.i);
-  set('heroTemp',    `${Math.round(cur.temperature_2m)}°`);
-  set('heroDesc',    info.d);
-  set('heroFeels',   `Feels like ${Math.round(cur.apparent_temperature)}°`);
-  set('heroLocation','📍 ' + state.name);
-  set('optimismSource', `Best case · ${best._label}`);
-
-  const validModels = models.filter(m => m.current);
-  const minWind  = Math.min(...validModels.map(m => m.current.windspeed_10m ?? Infinity));
-  const maxHi    = Math.max(...models.filter(m => m.daily?.temperature_2m_max?.[0] != null).map(m => m.daily.temperature_2m_max[0]));
-  const minLo    = Math.min(...models.filter(m => m.daily?.temperature_2m_min?.[0] != null).map(m => m.daily.temperature_2m_min[0]));
-  const minRain  = Math.min(...models.filter(m => m.daily?.precipitation_probability_max?.[0] != null).map(m => m.daily.precipitation_probability_max[0]));
-
-  set('sRain',  isFinite(minRain)  ? Math.round(minRain) + '%' : '--');
-  set('sWind',  isFinite(minWind)  ? Math.round(minWind)       : '--');
-  set('sRange', `${isFinite(maxHi) ? Math.round(maxHi) : '--'}° / ${isFinite(minLo) ? Math.round(minLo) : '--'}°`);
-
-  const DAY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const fEl = document.getElementById('forecastList');
-  fEl.innerHTML = '';
-  for (let i = 0; i < 7; i++) {
-    let bestCode = null, bestS = -Infinity, hiMax = -Infinity, loMin = Infinity, rainMin = Infinity;
-    for (const m of models) {
-      const d = m.daily;
-      if (!d) continue;
-      const code = d.weathercode?.[i];
-      if (code != null) {
-        const s = wmo(code).s;
-        if (s > bestS) { bestS = s; bestCode = code; }
-      }
-      if (d.temperature_2m_max?.[i] != null && d.temperature_2m_max[i] > hiMax) hiMax = d.temperature_2m_max[i];
-      if (d.temperature_2m_min?.[i] != null && d.temperature_2m_min[i] < loMin) loMin = d.temperature_2m_min[i];
-      if (d.precipitation_probability_max?.[i] != null && d.precipitation_probability_max[i] < rainMin) rainMin = d.precipitation_probability_max[i];
-    }
-    if (bestCode == null) continue;
-    const w    = wmo(bestCode);
-    const date = new Date(); date.setDate(date.getDate() + i);
-    const day  = i === 0 ? 'Today' : DAY[date.getDay()];
-    const row  = document.createElement('div');
-    row.className = 'fc-row';
-    row.innerHTML =
-      `<div class="fc-day">${day}</div>` +
-      `<div class="fc-icon">${w.i}</div>` +
-      `<div class="fc-rain">${isFinite(rainMin) ? Math.round(rainMin)+'%' : ''}</div>` +
-      `<div class="fc-temps">` +
-        `<div class="fc-hi">${isFinite(hiMax) ? Math.round(hiMax)+'°' : '--'}</div>` +
-        `<div class="fc-lo">${isFinite(loMin) ? Math.round(loMin)+'°' : '--'}</div>` +
-      `</div>`;
-    fEl.appendChild(row);
-  }
-
-  const pEl = document.getElementById('providerList');
-  pEl.innerHTML = '';
-  for (const m of models) {
-    if (!m.current) continue;
-    const w      = wmo(m.current.weathercode);
-    const chosen = m._model === best._model;
-    const row    = document.createElement('div');
-    row.className = 'src-row';
-    row.innerHTML =
-      `<div class="src-name">${m._label}</div>` +
-      `<div class="src-icon">${w.i}</div>` +
-      `<div class="src-detail">${Math.round(m.current.temperature_2m)}° · ${w.d}</div>` +
-      (chosen ? `<div class="src-chosen">chosen</div>` : '');
-    pEl.appendChild(row);
-  }
-
+  // Update URL for sharing
   const url = new URL(location.href);
   url.searchParams.set('lat',  state.lat.toFixed(4));
   url.searchParams.set('lon',  state.lon.toFixed(4));
@@ -539,20 +1079,16 @@ function render(models) {
   history.replaceState({}, '', url);
 
   set('lastUpdated', 'Updated ' + new Date().toLocaleTimeString());
-  document.getElementById('weatherDiv').classList.remove('hidden');
+  hideLoading();
+  rerenderWeather();
 }
 
-function shareWeather() {
-  const url = location.href;
-  if (navigator.share) {
-    navigator.share({ title: 'The Optimistic Weather App', text: `Best forecast for ${state.name}!`, url });
-  } else {
-    navigator.clipboard.writeText(url).then(() => toast('Link copied!'));
-  }
-}
-
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILITIES
+// ─────────────────────────────────────────────────────────────────────────────
 function set(id, v) { document.getElementById(id).textContent = v; }
 function coord(lat, lon) { return `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`; }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function showLoading() {
   document.getElementById('loadingDiv').classList.remove('hidden');
